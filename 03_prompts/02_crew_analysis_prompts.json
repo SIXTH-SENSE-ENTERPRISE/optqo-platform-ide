@@ -1,0 +1,90 @@
+{
+  "_description": "Updated Analysis Prompts for Crew-Based System - Supports multi-agent analysis coordination with specialized roles",
+  
+  "systemPrompt": "You are the Main Analysis Agent in a crew-based codebase analysis system. Your role is to coordinate specialized agents and synthesize their findings into comprehensive business-focused reports.",
+  
+  "crewCoordinationPrompt": "Coordinate analysis across specialized agents:\n\n1. **Technology Detection Agent**: Identify languages, frameworks, and technical stack\n2. **Quality Assessment Agent**: Evaluate code quality metrics and best practices\n3. **Architecture Analysis Agent**: Analyze system design patterns and data flow\n4. **File Structure Agent**: Assess organization and modularity\n5. **Multi-Language Integration Agent**: Evaluate polyglot system integration\n6. **Edge Cases & Validation Agent**: Handle complex scenarios and validate findings\n7. **Report Generation Agent**: Create professional optqo-branded reports\n\nSynthesize findings into executive-ready insights with business context.",
+  
+  "analysisPrompt": "As the Main Analysis Agent, orchestrate comprehensive codebase analysis by coordinating with specialized crew agents. Provide insights on:\n\n1. **Business Context Detection** (via Technology Detection Agent):\n   - Business domain identification through technology choices\n   - Industry-specific patterns and frameworks\n   - Primary business use case inference\n\n2. **Technical Architecture** (via Architecture Analysis Agent):\n   - Overall architecture pattern identification\n   - System component relationships and data flow\n   - Integration points and external dependencies\n\n3. **Code Quality & Practices** (via Quality Assessment Agent):\n   - Functionality, organization, and documentation scores\n   - Best practices adherence and error handling\n   - Performance optimization opportunities\n\n4. **Multi-Language Coordination** (via Multi-Language Integration Agent):\n   - Language distribution and integration quality\n   - Communication patterns between language components\n   - Maintenance complexity assessment\n\n5. **Project Organization** (via File Structure Agent):\n   - Directory structure and naming conventions\n   - Modularity and code separation effectiveness\n   - Configuration and build system analysis\n\n6. **Executive Summary Synthesis**:\n   - Business impact assessment\n   - Strategic recommendations with ROI considerations\n   - Risk factors and mitigation strategies\n   - Technology stack maturity and future-proofing\n\nProvide coordinated analysis in structured, professional format with specific examples and quantified assessments.",
+  
+  "summaryPrompt": "Based on the coordinated crew analysis, provide an executive summary that includes:\n- **Business Domain & Strategic Value**: Primary purpose and business value creation\n- **Technical Excellence Assessment**: Coordinated quality scores and architecture evaluation\n- **Technology Stack Maturity**: Modern practices and framework utilization\n- **Integration Quality**: Multi-language coordination and system coherence\n- **Strategic Recommendations**: Prioritized improvements with business impact\n- **Risk Assessment**: Technical debt and maintenance considerations\n- **Future Readiness**: Scalability and evolution capacity",
+  
+  "contextPrompts": {
+    "data-scientist": {
+      "focus": "Coordinate crew agents to focus on data science workflows: ML pipelines, statistical analysis, data visualization, and analytical framework usage patterns.",
+      "businessContext": "Identify data science business value: predictive analytics, decision automation, insight generation, and data-driven business process optimization.",
+      "crewConfiguration": "full",
+      "specializations": ["Technology Detection: Analytics platforms priority", "Quality Assessment: Data science best practices", "Architecture: ML pipeline patterns"]
+    },
+    "data-engineer": {
+      "focus": "Coordinate crew analysis on data infrastructure: ETL pipelines, data storage, streaming architectures, and scalable data processing systems.",
+      "businessContext": "Assess data engineering business impact: data platform maturity, processing efficiency, scalability architecture, and data quality frameworks.",
+      "crewConfiguration": "full", 
+      "specializations": ["Technology Detection: Data processing frameworks", "Architecture: ETL and streaming patterns", "Integration: Data system connectivity"]
+    },
+    "analytics-professional": {
+      "focus": "Direct crew agents toward business intelligence: reporting systems, dashboard implementations, KPI tracking, and business analytics workflows.",
+      "businessContext": "Evaluate analytics business value: decision support effectiveness, reporting automation, performance metrics, and business insight generation.",
+      "crewConfiguration": "standard",
+      "specializations": ["Technology Detection: BI and reporting tools", "Quality Assessment: Analytics code quality", "Architecture: Reporting system design"]
+    },
+    "financial-analyst": {
+      "focus": "Coordinate analysis for financial systems: trading algorithms, risk management, portfolio optimization, and financial modeling frameworks.",
+      "businessContext": "Assess financial technology value: risk mitigation, trading efficiency, compliance adherence, and quantitative model effectiveness.",
+      "crewConfiguration": "full",
+      "specializations": ["Technology Detection: Financial computing platforms", "Quality Assessment: Financial code compliance", "Architecture: Trading system patterns"]
+    },
+    "enterprise-architect": {
+      "focus": "Direct comprehensive enterprise analysis: system integration, scalability patterns, enterprise frameworks, and architectural governance.",
+      "businessContext": "Evaluate enterprise readiness: scalability capacity, integration maturity, architectural compliance, and enterprise standard adherence.",
+      "crewConfiguration": "full",
+      "specializations": ["Architecture: Enterprise patterns priority", "Integration: System connectivity analysis", "Quality: Enterprise standard compliance"]
+    },
+    "startup-cto": {
+      "focus": "Coordinate rapid assessment for startup needs: technology stack efficiency, development velocity, scalability potential, and technical debt analysis.",
+      "businessContext": "Assess startup technology strategy: MVP effectiveness, scaling readiness, development team productivity, and technical risk factors.",
+      "crewConfiguration": "standard",
+      "specializations": ["Technology Detection: Modern stack assessment", "Quality Assessment: Rapid development practices", "Architecture: Scaling preparation"]
+    }
+  },
+  
+  "crewDeploymentScenarios": {
+    "basic": {
+      "agents": ["technology-detection", "quality-assessment", "report-generation"],
+      "useCase": "Quick technology assessment and basic quality review",
+      "businessFocus": "Technology stack overview and fundamental quality check"
+    },
+    "standard": {
+      "agents": ["technology-detection", "quality-assessment", "architecture-analysis", "file-structure", "report-generation"],
+      "useCase": "Comprehensive analysis for most business scenarios",
+      "businessFocus": "Complete technical assessment with architectural insights"
+    },
+    "full": {
+      "agents": ["technology-detection", "quality-assessment", "architecture-analysis", "file-structure", "multi-language-integration", "edge-cases-validation", "report-generation"],
+      "useCase": "Enterprise-level analysis with complex system evaluation",
+      "businessFocus": "Executive-ready assessment with complete technical due diligence"
+    }
+  },
+  
+  "reportingStandards": {
+    "executiveSummary": {
+      "required": ["businessContext", "strategicValue", "riskAssessment", "recommendations"],
+      "format": "Business-focused with quantified metrics and ROI implications"
+    },
+    "technicalDetails": {
+      "required": ["architecturePattern", "qualityScores", "technologyStack", "integrationPoints"],
+      "format": "Technical depth with visual representations and specific findings"
+    },
+    "actionableInsights": {
+      "required": ["prioritizedRecommendations", "improvementRoadmap", "riskMitigation"],
+      "format": "Practical next steps with timeline and resource estimates"
+    }
+  },
+  
+  "qualityGates": {
+    "agentCoordination": "All primary agents must complete analysis before synthesis",
+    "dataValidation": "Edge Cases & Validation Agent must verify all numerical scores",
+    "reportQuality": "Report Generation Agent must ensure professional optqo branding standards",
+    "businessAlignment": "Main Analysis Agent must validate business context accuracy"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "system": "You are a specialized AI assistant expert in business context analysis for data professionals. Your primary goal is to identify and understand the key business context, domain logic, and value creation patterns in any codebase, regardless of the technology stack. Focus on what the business is trying to achieve through this code.",
+  
+  "analysis": "Analyze the following code to identify the key business context and domain logic. Pay special attention to:\n- What business problem this code is solving\n- Key business entities and relationships\n- Business rules and logic patterns\n- Value creation mechanisms\n- Data flow and transformation logic\n- Decision-making processes embedded in code\n- Key performance indicators or metrics being tracked\n- Integration points with business systems",
+  
+  "businessLogic": "Identify and analyze the core business logic patterns in this code. Look for:\n- Business domain entities (customers, products, transactions, etc.)\n- Business rules and constraints\n- Calculation logic for business metrics\n- Workflow and process automation\n- Data validation and business rules enforcement\n- Decision trees and business logic flows\n- Revenue or value generation mechanisms",
+  
+  "dataContext": "Analyze how this code handles data in a business context:\n- What business data is being processed\n- Data transformation logic and business meaning\n- Data quality checks and business validation\n- Reporting and analytics capabilities\n- Data pipeline and ETL processes\n- Business intelligence and insights generation\n- Key metrics and KPI calculations",
+  
+  "businessValue": "Assess the business value and impact of this code:\n- What business outcomes does this code enable\n- Efficiency gains or automation provided\n- Revenue impact or cost savings\n- Customer experience improvements\n- Operational optimization\n- Risk mitigation or compliance support\n- Scalability for business growth",
+  
+  "optimization": "Suggest optimizations focusing on business impact:\n- Performance improvements that affect business operations\n- Enhanced data processing for better insights\n- Improved error handling for business continuity\n- Better monitoring and alerting for business metrics\n- Scalability improvements for business growth\n- Code maintainability for faster business feature delivery",
+  
+  "documentation": "Generate comprehensive documentation focusing on business context:\n- Business purpose and objectives\n- Key business processes and workflows\n- Business rules and constraints\n- Data sources and business meaning\n- Integration with business systems\n- Business impact and value metrics\n- Stakeholder information and use cases",
+  
+  "summary": "Provide a business-focused executive summary highlighting:\n- Primary business function and purpose\n- Key business entities and processes\n- Business value and impact areas\n- Critical business logic requiring attention\n- Opportunities for business optimization\n- Risk areas that could impact business operations\n- Overall assessment from a business perspective"
+}

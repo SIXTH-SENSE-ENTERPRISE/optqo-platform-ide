@@ -1,0 +1,53 @@
+{
+  "name": "modular-ai-agent",
+  "version": "1.0.0",
+  "description": "Configuration-driven AI agent with modular architecture for code analysis and optimization",
+  "main": "07_interface/electron/01_main.cjs",
+  "type": "module",
+  "scripts": {
+    "start": "node 01_launcher/01_main.js help",
+    "init": "node 01_launcher/01_main.js init",
+    "test": "node 09_quality_assurance/test-suite.js",
+    "demo": "node 01_launcher/01_main.js init data-scientist && node 01_launcher/01_main.js status",
+    "analyze": "node 01_launcher/01_main.js analyze",
+    "pipeline": "node 01_launcher/01_main.js pipeline",
+    "contexts": "node 01_launcher/01_main.js contexts",
+    "dev": "node --watch 01_launcher/01_main.js",
+    "setup": "npm install && echo Run: npm run demo to get started",
+    "gui": "electron 07_interface/electron/01_main.cjs",
+    "gui-dev": "NODE_ENV=development electron 07_interface/electron/01_main.cjs",
+    "gui-detached": "start \"optqo Platform\" electron 07_interface/electron/01_main.cjs",
+    "gui-force": "cmd /c \"electron 07_interface/electron/01_main.cjs\"",
+    "gui-web": "node 07_interface/servers/05_simple_enhanced_server.js",
+    "gui-launcher": "node 07_interface/servers/06_gui_launcher.js",
+    "gui-both": "node 07_interface/servers/06_gui_launcher.js both",
+    "server": "node 07_interface/servers/05_simple_enhanced_server.js",
+    "workspace": "node 08_workspace/workspace-manager.js"
+  },
+  "keywords": [
+    "ai-agent",
+    "modular-architecture",
+    "configuration-driven",
+    "code-analysis",
+    "financial-analysis",
+    "optimization",
+    "cli"
+  ],
+  "author": "Modular AI Agent Team",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "electron": "^27.3.11",
+    "express": "^4.21.2",
+    "fs-extra": "^11.1.1",
+    "glob": "^10.3.3",
+    "handlebars": "^4.7.8",
+    "marked": "^9.1.2"
+  },
+  "devDependencies": {
+    "eslint": "^8.49.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

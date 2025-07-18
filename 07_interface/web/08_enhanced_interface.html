@@ -1,0 +1,1445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>optqo Platform - Advanced Interface</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .create-project-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .create-project-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .workspace-selector {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .workspace-selector select {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .workspace-selector select option {
+            background: #1a1a2e;
+            color: white;
+        }
+
+        .main-container {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 300px 1fr 400px;
+            gap: 0;
+            min-height: 0;
+        }
+
+        .main-container {
+            display: flex;
+            flex: 1;
+            height: calc(100vh - 100px);
+        }
+
+        .agent-crew-panel {
+            width: 350px;
+            background: rgba(255, 255, 255, 0.03);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .crew-header {
+            margin-bottom: 20px;
+        }
+
+        .crew-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #667eea;
+        }
+
+        .agent-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .agent-item.active {
+            background: rgba(102, 126, 234, 0.2);
+            border-color: rgba(102, 126, 234, 0.5);
+        }
+
+        .agent-item.completed {
+            background: rgba(34, 197, 94, 0.2);
+            border-color: rgba(34, 197, 94, 0.5);
+        }
+
+        .agent-name {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .agent-status {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .content-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .project-workspace {
+            flex: 1;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .project-upload-area {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            margin-bottom: 30px;
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .upload-options {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .upload-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .upload-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .analyze-section {
+            display: none;
+            margin-top: 30px;
+        }
+
+        .analyze-btn {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .analyze-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(34, 197, 94, 0.4);
+        }
+
+        .project-info {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .sidebar {
+            background: rgba(255, 255, 255, 0.03);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-section {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .file-browser {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .file-tree {
+            list-style: none;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            margin: 2px 0;
+        }
+
+        .file-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .file-item.selected {
+            background: rgba(103, 126, 234, 0.3);
+            border-left: 3px solid #667eea;
+        }
+
+        .file-icon {
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .folder-icon { color: #ffd700; }
+        .js-icon { color: #f7df1e; }
+        .json-icon { color: #85ea2d; }
+        .md-icon { color: #4fc3f7; }
+        .html-icon { color: #e34c26; }
+        .css-icon { color: #1572b6; }
+
+        .content-area {
+            display: flex;
+            flex-direction: column;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .tabs {
+            display: flex;
+            background: rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            overflow-x: auto;
+        }
+
+        .tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .tab.active {
+            background: rgba(103, 126, 234, 0.2);
+            border-bottom: 2px solid #667eea;
+        }
+
+        .tab:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .tab-close {
+            margin-left: 8px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .tab-close:hover {
+            color: #ff6b6b;
+        }
+
+        .editor-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .editor-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .editor-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .action-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(103, 126, 234, 0.3);
+        }
+
+        .action-button.secondary {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .editor {
+            flex: 1;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            font-family: 'JetBrains Mono', 'Consolas', 'Monaco', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            border: none;
+            resize: none;
+            padding: 20px;
+            outline: none;
+        }
+
+        .analysis-panel {
+            background: rgba(255, 255, 255, 0.03);
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: between;
+            align-items: center;
+        }
+
+        .panel-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .crew-status {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .crew-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .crew-agent {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .crew-agent.active {
+            border-left-color: #4fc3f7;
+            background: rgba(79, 195, 247, 0.1);
+        }
+
+        .crew-agent.completed {
+            border-left-color: #4caf50;
+            background: rgba(76, 175, 80, 0.1);
+        }
+
+        .agent-name {
+            font-weight: 600;
+            font-size: 12px;
+            margin-bottom: 4px;
+        }
+
+        .agent-status {
+            font-size: 10px;
+            opacity: 0.7;
+        }
+
+        .progress-section {
+            padding: 20px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .progress-item {
+            background: rgba(255, 255, 255, 0.05);
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 3px solid #667eea;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .progress-title {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .progress-time {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        .progress-content {
+            font-size: 13px;
+            line-height: 1.4;
+            opacity: 0.9;
+        }
+
+        .workspace-info {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-size: 12px;
+            margin-bottom: 15px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-active { background: rgba(76, 175, 80, 0.2); color: #4caf50; }
+        .status-working { background: rgba(255, 193, 7, 0.2); color: #ffc107; }
+        .status-completed { background: rgba(33, 150, 243, 0.2); color: #2196f3; }
+
+        .footer {
+            background: rgba(255, 255, 255, 0.03);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+        }
+
+        .status-bar {
+            display: flex;
+            gap: 20px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .main-container {
+                grid-template-columns: 250px 1fr 300px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr auto;
+            }
+            
+            .sidebar, .analysis-panel {
+                display: none;
+            }
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            margin: 5% auto;
+            padding: 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            width: 600px;
+            max-width: 90%;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            color: #667eea;
+        }
+
+        .close {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close:hover {
+            color: #ff6b6b;
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .project-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .option-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 30px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .option-card:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(102, 126, 234, 0.5);
+            transform: translateY(-4px);
+        }
+
+        .option-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .option-card h3 {
+            margin-bottom: 10px;
+            color: #667eea;
+        }
+
+        .option-card p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+        }
+
+        .project-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .project-form input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 12px 16px;
+            color: white;
+            font-size: 16px;
+        }
+
+        .project-form input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .project-form button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .project-form button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo-section">
+            <div class="logo">
+                <div class="logo-icon">O</div>
+                <span>optqo Platform</span>
+            </div>
+            <button class="create-project-btn" onclick="showCreateProjectModal()">
+                <span>📁</span> Create Project
+            </button>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <!-- Agent Crew Panel -->
+        <div class="agent-crew-panel">
+            <div class="crew-header">
+                <div class="crew-title">🤖 Agent Crew Workflow</div>
+            </div>
+            
+            <div class="agent-item">
+                <div class="agent-name">1. Data Scientist Agent</div>
+                <div class="agent-status">Statistical analysis & patterns</div>
+            </div>
+            
+            <div class="agent-item">
+                <div class="agent-name">2. Architecture Agent</div>
+                <div class="agent-status">Code structure & design</div>
+            </div>
+            
+            <div class="agent-item">
+                <div class="agent-name">3. Security Agent</div>
+                <div class="agent-status">Vulnerability assessment</div>
+            </div>
+            
+            <div class="agent-item">
+                <div class="agent-name">4. Performance Agent</div>
+                <div class="agent-status">Optimization analysis</div>
+            </div>
+            
+            <div class="agent-item">
+                <div class="agent-name">5. Quality Agent</div>
+                <div class="agent-status">Code quality metrics</div>
+            </div>
+            
+            <div class="agent-item">
+                <div class="agent-name">6. Documentation Agent</div>
+                <div class="agent-status">Report generation</div>
+            </div>
+            
+            <div class="agent-item">
+                <div class="agent-name">7. Orchestrator Agent</div>
+                <div class="agent-status">Workflow coordination</div>
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="content-area">
+            <div class="project-workspace" id="projectWorkspace">
+                <div class="project-upload-area">
+                    <div class="upload-icon">📁</div>
+                    <h2>Ready to Analyze Your Code?</h2>
+                    <p>Upload your project files or clone from GitHub to get started</p>
+                    
+                    <div class="upload-options">
+                        <button class="upload-btn" onclick="uploadFiles()">
+                            <span>📂</span> Upload Files
+                        </button>
+                        <button class="upload-btn" onclick="cloneFromGitHub()">
+                            <span>🐙</span> Clone GitHub
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="analyze-section" id="analyzeSection">
+                    <div class="project-info" id="projectInfo" style="display: none;">
+                        <h3>Project Loaded</h3>
+                        <div id="projectDetails"></div>
+                    </div>
+                    
+                    <button class="analyze-btn" onclick="startAnalysis()">
+                        🚀 Start Analysis
+                    </button>
+                </div>
+        </div>
+    </div>
+
+    <!-- Create Project Modal -->
+    <div id="createProjectModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Create New Project</h2>
+                <span class="close" onclick="hideCreateProjectModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="project-options">
+                    <div class="option-card" onclick="selectProjectType('upload')">
+                        <div class="option-icon">�</div>
+                        <h3>Upload Files</h3>
+                        <p>Upload your project files directly</p>
+                    </div>
+                    <div class="option-card" onclick="selectProjectType('github')">
+                        <div class="option-icon">�</div>
+                        <h3>Clone from GitHub</h3>
+                        <p>Import a repository from GitHub</p>
+                    </div>
+                </div>
+                
+                <div id="uploadForm" class="project-form" style="display: none;">
+                    <input type="file" id="fileInput" multiple webkitdirectory>
+                    <button onclick="processUpload()">Upload Project</button>
+                </div>
+                
+                <div id="githubForm" class="project-form" style="display: none;">
+                    <input type="text" id="githubUrl" placeholder="GitHub repository URL">
+                    <button onclick="cloneRepository()">Clone Repository</button>
+                </div>
+            </div>
+        </div>
+    </div>
+                        <div class="agent-name">📊 Data Scientist</div>
+                        <div class="agent-status">Ready for analysis</div>
+                    </div>
+                    <div class="crew-agent">
+                        <div class="agent-name">🏗️ Architect</div>
+                        <div class="agent-status">Standby</div>
+                    </div>
+                    <div class="crew-agent">
+                        <div class="agent-name">⚡ Optimizer</div>
+                        <div class="agent-status">Standby</div>
+                    </div>
+                    <div class="crew-agent">
+                        <div class="agent-name">📝 Documenter</div>
+                        <div class="agent-status">Standby</div>
+                    </div>
+                    <div class="crew-agent">
+                        <div class="agent-name">🔍 Quality Expert</div>
+                        <div class="agent-status">Standby</div>
+                    </div>
+                    <div class="crew-agent">
+                        <div class="agent-name">🛡️ Security Analyst</div>
+                        <div class="agent-status">Standby</div>
+                    </div>
+                    <div class="crew-agent">
+                        <div class="agent-name">📈 Business Analyst</div>
+                        <div class="agent-status">Standby</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="progress-section" id="progressSection">
+                <div class="progress-item">
+                    <div class="progress-header">
+                        <div class="progress-title">System Ready</div>
+                        <div class="progress-time">Now</div>
+                    </div>
+                    <div class="progress-content">
+                        All crew agents initialized and ready for analysis. Select files and start analysis to begin.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div class="status-bar">
+            <span>📡 Connection: <strong id="connectionStatus">Standalone</strong></span>
+            <span>🔧 Mode: <strong id="analysisMode">Crew System</strong></span>
+            <span>⚡ Status: <strong id="systemStatus">Ready</strong></span>
+        </div>
+        <div>
+            <span>optqo Platform v2.0 - Professional Code Analysis</span>
+        </div>
+    </div>
+
+    <script>
+        let currentProject = null;
+        let analysisInProgress = false;
+        
+        // Initialize the interface
+        document.addEventListener('DOMContentLoaded', function() {
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            // Modal close functionality
+            window.onclick = function(event) {
+                const modal = document.getElementById('createProjectModal');
+                if (event.target === modal) {
+                    hideCreateProjectModal();
+                }
+            };
+        }
+
+        // Create Project Modal Functions
+        function showCreateProjectModal() {
+            document.getElementById('createProjectModal').style.display = 'block';
+        }
+
+        function hideCreateProjectModal() {
+            document.getElementById('createProjectModal').style.display = 'none';
+            // Reset forms
+            document.getElementById('uploadForm').style.display = 'none';
+            document.getElementById('githubForm').style.display = 'none';
+        }
+
+        function selectProjectType(type) {
+            // Hide all forms
+            document.getElementById('uploadForm').style.display = 'none';
+            document.getElementById('githubForm').style.display = 'none';
+            
+            // Show selected form
+            if (type === 'upload') {
+                document.getElementById('uploadForm').style.display = 'block';
+            } else if (type === 'github') {
+                document.getElementById('githubForm').style.display = 'block';
+            }
+        }
+
+        // File Upload Functions
+        function uploadFiles() {
+            document.getElementById('fileInput').click();
+        }
+
+        function processUpload() {
+            const fileInput = document.getElementById('fileInput');
+            if (fileInput.files.length > 0) {
+                showProjectLoaded('Uploaded Project', fileInput.files.length + ' files uploaded');
+                hideCreateProjectModal();
+            }
+        }
+
+        // GitHub Clone Functions
+        function cloneFromGitHub() {
+            const url = document.getElementById('githubUrl').value;
+            if (url) {
+                cloneRepository();
+            } else {
+                alert('Please enter a GitHub repository URL');
+            }
+        }
+
+        function cloneRepository() {
+            const githubUrl = document.getElementById('githubUrl').value;
+            if (!githubUrl) {
+                alert('Please enter a valid GitHub URL');
+                return;
+            }
+            
+            // Simulate cloning process
+            showProjectLoaded('GitHub Repository', githubUrl);
+            hideCreateProjectModal();
+        }
+
+        // Project Management
+        function showProjectLoaded(projectName, details) {
+            currentProject = { name: projectName, details: details };
+            
+            // Update project info
+            document.getElementById('projectInfo').style.display = 'block';
+            document.getElementById('projectDetails').innerHTML = `
+                <strong>Project:</strong> ${projectName}<br>
+                <strong>Source:</strong> ${details}
+            `;
+            
+            // Show analyze section
+            document.getElementById('analyzeSection').style.display = 'block';
+            
+            // Update agent crew to show ready state
+            updateAgentCrewStatus('ready');
+        }
+
+        // Analysis Functions
+        function startAnalysis() {
+            if (!currentProject) {
+                alert('Please load a project first');
+                return;
+            }
+            
+            if (analysisInProgress) {
+                alert('Analysis already in progress');
+                return;
+            }
+            
+            analysisInProgress = true;
+            updateAgentCrewStatus('analyzing');
+            
+            // Simulate analysis progress
+            simulateAnalysisProgress();
+        }
+
+        function simulateAnalysisProgress() {
+            const agents = document.querySelectorAll('.agent-item');
+            let currentAgent = 0;
+            
+            function activateNextAgent() {
+                if (currentAgent < agents.length) {
+                    // Mark current agent as active
+                    agents[currentAgent].classList.add('active');
+                    agents[currentAgent].querySelector('.agent-status').textContent = 'Analyzing...';
+                    
+                    setTimeout(() => {
+                        // Mark as completed
+                        agents[currentAgent].classList.remove('active');
+                        agents[currentAgent].classList.add('completed');
+                        agents[currentAgent].querySelector('.agent-status').textContent = 'Completed';
+                        
+                        currentAgent++;
+                        if (currentAgent < agents.length) {
+                            activateNextAgent();
+                        } else {
+                            // Analysis complete
+                            completeAnalysis();
+                        }
+                    }, 2000);
+                }
+            }
+            
+            activateNextAgent();
+        }
+
+        function completeAnalysis() {
+            analysisInProgress = false;
+            alert('Analysis Complete! Report generated successfully.');
+            
+            // Reset agent states
+            const agents = document.querySelectorAll('.agent-item');
+            agents.forEach(agent => {
+                agent.classList.remove('active', 'completed');
+                agent.querySelector('.agent-status').textContent = agent.querySelector('.agent-status').textContent.replace('Analyzing...', '').replace('Completed', '').trim() || 'Ready';
+            });
+        }
+
+        function updateAgentCrewStatus(status) {
+            // Update agent crew display based on status
+            const agents = document.querySelectorAll('.agent-item');
+            
+            if (status === 'ready') {
+                agents.forEach(agent => {
+                    agent.classList.remove('active', 'completed');
+                });
+            }
+        }
+
+        // Utility Functions
+        function getFileIcon(fileName) {
+            const ext = fileName.split('.').pop().toLowerCase();
+            const iconMap = {
+                'js': '📄',
+                'ts': '📄', 
+                'json': '📄',
+                'md': '📄',
+                'html': '📄',
+                'css': '📄',
+                'py': '📄',
+                'txt': '📄'
+            };
+            return iconMap[ext] || '📄';
+        }
+    </script>
+</body>
+</html>
+            try {
+                const response = await fetch('/api/files/browse?path=');
+                const files = await response.json();
+                
+                const fileTree = document.getElementById('fileTree');
+                fileTree.innerHTML = ''; // Clear existing content
+                
+                files.forEach(file => {
+                    const li = document.createElement('li');
+                    li.className = 'file-item';
+                    li.onclick = () => selectFile(file.path);
+                    
+                    const icon = file.type === 'directory' ? '📁' : getFileIcon(file.name);
+                    li.innerHTML = `
+                        <span class="file-icon">${icon}</span>
+                        ${file.name}
+                    `;
+                    
+                    fileTree.appendChild(li);
+                });
+            } catch (error) {
+                console.error('Failed to load file tree:', error);
+                // Fallback to mock data if API fails
+                loadMockFileTree();
+            }
+        }
+
+        function loadMockFileTree() {
+            const fileTree = document.getElementById('fileTree');
+            fileTree.innerHTML = `
+                <li class="file-item" onclick="selectFile('/')">
+                    <span class="file-icon folder-icon">📁</span>
+                    Root Directory
+                </li>
+                <li class="file-item" onclick="selectFile('/01_launcher')">
+                    <span class="file-icon folder-icon">📁</span>
+                    01_launcher
+                </li>
+                <li class="file-item" onclick="selectFile('/05_core')">
+                    <span class="file-icon folder-icon">📁</span>
+                    05_core
+                </li>
+                <li class="file-item" onclick="selectFile('/06_activities')">
+                    <span class="file-icon folder-icon">📁</span>
+                    06_activities
+                </li>
+                <li class="file-item" onclick="selectFile('/07_interface')">
+                    <span class="file-icon folder-icon">📁</span>
+                    07_interface
+                </li>
+                <li class="file-item" onclick="selectFile('/package.json')">
+                    <span class="file-icon">🟩</span>
+                    package.json
+                </li>
+            `;
+        }
+
+        function setupEventListeners() {
+            document.getElementById('workspaceSelect').addEventListener('change', function(e) {
+                if (e.target.value === 'new') {
+                    createNewProject();
+                } else {
+                    switchWorkspace(e.target.value);
+                }
+            });
+        }
+
+        async function loadWorkspaces() {
+            // In a real implementation, this would fetch from the server
+            const workspaceSelect = document.getElementById('workspaceSelect');
+            
+            // Simulate loading existing workspaces
+            const mockWorkspaces = [
+                { id: 'proj_001', name: 'Financial Analysis Project' },
+                { id: 'proj_002', name: 'Data Pipeline Optimization' },
+                { id: 'proj_003', name: 'Enterprise Architecture Review' }
+            ];
+
+            mockWorkspaces.forEach(workspace => {
+                const option = document.createElement('option');
+                option.value = workspace.id;
+                option.textContent = workspace.name;
+                workspaceSelect.appendChild(option);
+            });
+        }
+
+        function createNewProject() {
+            const projectName = prompt('Enter project name:');
+            const projectType = prompt('Enter project type (analysis/repo/optimization):') || 'analysis';
+            
+            if (projectName) {
+                // In a real implementation, this would call the server API
+                const workspaceId = `proj_${Date.now()}`;
+                addWorkspaceToSelect(workspaceId, projectName);
+                switchWorkspace(workspaceId);
+                
+                updateWorkspaceInfo(projectName, projectType);
+                addProgressItem('Project Created', `New workspace "${projectName}" created successfully`);
+            }
+        }
+
+        function addWorkspaceToSelect(id, name) {
+            const workspaceSelect = document.getElementById('workspaceSelect');
+            const option = document.createElement('option');
+            option.value = id;
+            option.textContent = name;
+            workspaceSelect.appendChild(option);
+            workspaceSelect.value = id;
+        }
+
+        function switchWorkspace(workspaceId) {
+            currentWorkspace = workspaceId;
+            
+            if (workspaceId === 'standalone') {
+                updateWorkspaceInfo('Standalone Mode', 'File System Browser');
+                document.getElementById('connectionStatus').textContent = 'Standalone';
+            } else {
+                updateWorkspaceInfo(`Project ${workspaceId}`, 'Analysis Workspace');
+                document.getElementById('connectionStatus').textContent = 'Server Connected';
+            }
+            
+            resetCrewStatus();
+            addProgressItem('Workspace Switched', `Now working in workspace: ${workspaceId}`);
+        }
+
+        function updateWorkspaceInfo(name, type) {
+            const workspaceInfo = document.getElementById('workspaceInfo');
+            workspaceInfo.innerHTML = `
+                <strong>Current:</strong> ${name}<br>
+                <strong>Type:</strong> ${type}
+            `;
+        }
+
+        async function selectFile(filePath) {
+            // Remove previous selection
+            document.querySelectorAll('.file-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            
+            // Add selection to clicked item
+            event.target.closest('.file-item').classList.add('selected');
+            
+            // Update current file display
+            document.getElementById('currentFile').textContent = filePath;
+            
+            // Check if it's a directory or file
+            try {
+                const response = await fetch(`/api/files/browse?path=${encodeURIComponent(filePath)}`);
+                if (response.ok) {
+                    // It's a directory - expand it
+                    const files = await response.json();
+                    expandDirectory(filePath, files);
+                } else {
+                    // It's a file - load content
+                    loadFileContent(filePath);
+                    
+                    // Open in new tab if not already open
+                    if (!openTabs.has(filePath)) {
+                        openTab(filePath);
+                    } else {
+                        switchTab(filePath);
+                    }
+                }
+            } catch (error) {
+                console.error('Error selecting file:', error);
+                // Fallback to file loading
+                loadFileContent(filePath);
+                if (!openTabs.has(filePath)) {
+                    openTab(filePath);
+                } else {
+                    switchTab(filePath);
+                }
+            }
+        }
+
+        function expandDirectory(dirPath, files) {
+            // This would expand the directory in the tree view
+            // For now, just show a message
+            const editor = document.getElementById('codeEditor');
+            editor.value = `Directory: ${dirPath}\n\nContains ${files.length} items:\n\n` +
+                          files.map(f => `${f.type === 'directory' ? '📁' : '📄'} ${f.name}`).join('\n');
+        }
+
+        async function loadFileContent(filePath) {
+            const editor = document.getElementById('codeEditor');
+            
+            try {
+                // Try to fetch real file content from server
+                const response = await fetch(`/api/files/content?path=${encodeURIComponent(filePath)}`);
+                
+                if (response.ok) {
+                    const content = await response.text();
+                    editor.value = content;
+                } else {
+                    // Fallback to mock content
+                    loadMockFileContent(filePath);
+                }
+            } catch (error) {
+                console.error('Failed to load file content:', error);
+                loadMockFileContent(filePath);
+            }
+        }
+
+        function loadMockFileContent(filePath) {
+            const editor = document.getElementById('codeEditor');
+            
+            // Mock file content loading
+            const mockContent = {
+                '/package.json': '{\n  "name": "optqo-platform",\n  "version": "2.0.0",\n  "type": "module"\n}',
+                '/README.md': '# optqo Platform\n\nAdvanced AI-powered code analysis platform',
+                '/': 'Select a specific file to view its contents'
+            };
+            
+            const content = mockContent[filePath] || `// Contents of ${filePath}\n// This would be loaded from the server`;
+            editor.value = content;
+        }
+
+        function openTab(filePath) {
+            const tabContainer = document.getElementById('tabContainer');
+            const fileName = filePath.split('/').pop() || 'Root';
+            
+            const tab = document.createElement('div');
+            tab.className = 'tab';
+            tab.setAttribute('data-file', filePath);
+            tab.innerHTML = `
+                <span>${getFileIcon(filePath)} ${fileName}</span>
+                <span class="tab-close" onclick="closeTab('${filePath}')">&times;</span>
+            `;
+            tab.onclick = () => switchTab(filePath);
+            
+            tabContainer.appendChild(tab);
+            openTabs.set(filePath, tab);
+            switchTab(filePath);
+        }
+
+        function switchTab(filePath) {
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Add active class to selected tab
+            if (openTabs.has(filePath)) {
+                openTabs.get(filePath).classList.add('active');
+                activeTab = filePath;
+                loadFileContent(filePath);
+                document.getElementById('currentFile').textContent = filePath;
+            }
+        }
+
+        function closeTab(filePath) {
+            if (openTabs.has(filePath)) {
+                const tab = openTabs.get(filePath);
+                tab.remove();
+                openTabs.delete(filePath);
+                
+                // Switch to another tab if this was active
+                if (activeTab === filePath && openTabs.size > 0) {
+                    const firstTab = openTabs.keys().next().value;
+                    switchTab(firstTab);
+                }
+            }
+        }
+
+        function getFileIcon(filePath) {
+            const ext = filePath.split('.').pop();
+            const icons = {
+                'js': '🟨',
+                'json': '🟩',
+                'md': '🔵',
+                'html': '🟧',
+                'css': '🟦'
+            };
+            return icons[ext] || '📄';
+        }
+
+        function browseFiles() {
+            // In a real implementation, this would open a file browser dialog
+            // or expand the file tree with server-side directory listing
+            addProgressItem('Browse Files', 'File browser functionality would connect to server API');
+        }
+
+        async function startAnalysis() {
+            const code = document.getElementById('codeEditor').value;
+            
+            if (!code || code.trim() === '') {
+                alert('Please select a file or enter code to analyze');
+                return;
+            }
+            
+            // Reset crew status
+            resetCrewStatus();
+            
+            // Simulate crew analysis
+            simulateCrewAnalysis();
+            
+            addProgressItem('Analysis Started', 'Crew-based analysis initiated with 7 specialized agents');
+        }
+
+        function resetCrewStatus() {
+            document.querySelectorAll('.crew-agent').forEach(agent => {
+                agent.classList.remove('active', 'completed');
+                agent.querySelector('.agent-status').textContent = 'Standby';
+            });
+        }
+
+        async function simulateCrewAnalysis() {
+            const agents = document.querySelectorAll('.crew-agent');
+            const agentNames = [
+                'Data Scientist', 'Architect', 'Optimizer', 
+                'Documenter', 'Quality Expert', 'Security Analyst', 'Business Analyst'
+            ];
+            
+            for (let i = 0; i < agents.length; i++) {
+                // Activate current agent
+                agents[i].classList.add('active');
+                agents[i].querySelector('.agent-status').textContent = 'Analyzing...';
+                
+                addProgressItem(
+                    `${agentNames[i]} Working`,
+                    `${agentNames[i]} is analyzing the code for specialized insights`
+                );
+                
+                // Simulate work time
+                await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
+                
+                // Complete current agent
+                agents[i].classList.remove('active');
+                agents[i].classList.add('completed');
+                agents[i].querySelector('.agent-status').textContent = 'Completed';
+                
+                addProgressItem(
+                    `${agentNames[i]} Complete`,
+                    `${agentNames[i]} analysis finished with actionable insights`
+                );
+            }
+            
+            // Final summary
+            addProgressItem(
+                'Analysis Complete',
+                'All 7 crew agents have completed their analysis. Comprehensive report generated.'
+            );
+            
+            document.getElementById('systemStatus').textContent = 'Analysis Complete';
+        }
+
+        function addProgressItem(title, content) {
+            const progressSection = document.getElementById('progressSection');
+            const time = new Date().toLocaleTimeString();
+            
+            const item = document.createElement('div');
+            item.className = 'progress-item';
+            item.innerHTML = `
+                <div class="progress-header">
+                    <div class="progress-title">${title}</div>
+                    <div class="progress-time">${time}</div>
+                </div>
+                <div class="progress-content">${content}</div>
+            `;
+            
+            progressSection.insertBefore(item, progressSection.firstChild);
+            
+            // Keep only last 10 items
+            while (progressSection.children.length > 10) {
+                progressSection.removeChild(progressSection.lastChild);
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+{
+    "terminal.integrated.env.windows": {
+        "ELECTRON_IS_DEV": "0",
+        "NODE_ENV": "production"
+    },
+    "terminal.integrated.defaultProfile.windows": "Command Prompt",
+    "terminal.integrated.profiles.windows": {
+        "Command Prompt": {
+            "path": "cmd.exe",
+            "args": [],
+            "icon": "terminal-cmd"
+        },
+        "PowerShell": {
+            "source": "PowerShell",
+            "icon": "terminal-powershell"
+        }
+    },
+    "terminal.integrated.allowWorkspaceConfiguration": true,
+    "terminal.integrated.inheritEnv": true
+}

@@ -1,0 +1,126 @@
+{
+  "data-scientist": {
+    "name": "data-scientist",
+    "description": "Business context analysis for data science and analytics professionals",
+    "focus": [
+      "business-context-identification",
+      "domain-logic-analysis",
+      "data-driven-insights", 
+      "business-value-assessment",
+      "process-optimization",
+      "decision-support-systems"
+    ],
+    "enabledActivities": ["analyze"],
+    "promptsFile": "03_prompts/analysis-prompts.json",
+    "templatePath": "04_templates/business-context-report.html",
+    "outputFormat": "html",
+    "analysisDepth": "deep",
+    "specialPatterns": [
+      "business.*logic|rule",
+      "metric|kpi|measurement",
+      "process|workflow|pipeline",
+      "customer|client|user",
+      "revenue|profit|cost"
+    ]
+  },
+
+  "data-engineer": {
+    "name": "data-engineer",
+    "description": "Focused on data engineering and ETL pipeline analysis",
+    "focus": [
+      "etl-pipelines",
+      "data-ingestion",
+      "data-transformation",
+      "performance-optimization",
+      "scalability",
+      "data-quality-monitoring"
+    ],
+    "enabledActivities": ["analyze"],
+    "promptsFile": "03_prompts/analysis-prompts.json",
+    "templatePath": "04_templates/data-engineering-report.html",
+    "outputFormat": "html",
+    "analysisDepth": "deep",
+    "specialPatterns": [
+      "spark|airflow|kafka",
+      "etl|extract.*transform.*load",
+      "pipeline|workflow",
+      "batch.*processing|streaming",
+      "data.*warehouse|lake"
+    ]
+  },
+
+  "analytics-professional": {
+    "name": "analytics-professional",
+    "description": "For business analytics and reporting systems",
+    "focus": [
+      "business-intelligence",
+      "reporting-systems",
+      "dashboard-development",
+      "data-visualization",
+      "performance-metrics",
+      "analytical-workflows"
+    ],
+    "enabledActivities": ["analyze"],
+    "promptsFile": "03_prompts/analysis-prompts.json",
+    "templatePath": "04_templates/analytics-report.html",
+    "outputFormat": "html",
+    "analysisDepth": "standard",
+    "specialPatterns": [
+      "dashboard|visualization",
+      "report|analytics",
+      "metric|kpi",
+      "business.*intelligence",
+      "tableau|powerbi|looker"
+    ]
+  },
+  
+  "code-optimizer": {
+    "name": "code-optimizer", 
+    "description": "Focused on performance optimization and code quality",
+    "focus": [
+      "performance-bottlenecks",
+      "code-complexity",
+      "best-practices",
+      "optimization-opportunities",
+      "memory-usage",
+      "algorithmic-efficiency"
+    ],
+    "enabledActivities": ["analyze"],
+    "promptsFile": "03_prompts/analysis-prompts.json",
+    "templatePath": "04_templates/optimization-report.html", 
+    "outputFormat": "html",
+    "analysisDepth": "deep",
+    "specialPatterns": [
+      "O\\(n\\^?[2-9]\\)",
+      "nested.*loop",
+      "inefficient.*algorithm",
+      "memory.*leak",
+      "performance.*bottleneck"
+    ]
+  },
+  
+  "general-analyst": {
+    "name": "general-analyst",
+    "description": "General-purpose code analysis and documentation",
+    "focus": [
+      "code-structure",
+      "documentation-quality", 
+      "maintainability",
+      "dependency-analysis",
+      "architecture-patterns",
+      "code-organization"
+    ],
+    "enabledActivities": ["analyze"],
+    "promptsFile": "03_prompts/analysis-prompts.json",
+    "templatePath": "04_templates/general-report.html",
+    "outputFormat": "html", 
+    "analysisDepth": "standard",
+    "specialPatterns": [
+      "TODO|FIXME|HACK",
+      "deprecated",
+      "legacy.*code",
+      "missing.*documentation",
+      "code.*smell"
+    ]
+  }
+}

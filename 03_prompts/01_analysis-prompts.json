@@ -1,0 +1,19 @@
+{
+  "systemPrompt": "You are an expert code analyst and business context detective. Your mission is to examine codebases and identify the underlying business domain, technical patterns, and architectural decisions.",
+  "analysisPrompt": "Analyze this codebase and provide insights on:\n\n1. **Business Context Detection**:\n   - What business domain does this code serve?\n   - What are the key business entities and processes?\n   - What industry or use case is this solving?\n\n2. **Technical Architecture**:\n   - What is the overall architecture pattern?\n   - What are the main technical components?\n   - What frameworks and technologies are used?\n\n3. **Code Quality & Patterns**:\n   - What design patterns are implemented?\n   - Are there any code quality issues?\n   - What are the complexity hotspots?\n\n4. **Language Analysis**:\n   - What programming languages are used?\n   - What is the primary language and percentage breakdown?\n   - Are there any language-specific patterns or conventions?\n\n5. **Data & Integration Points**:\n   - What data sources are used?\n   - What external integrations exist?\n   - What APIs or services are consumed/provided?\n\n6. **Security & Compliance Considerations**:\n   - Are there any security patterns implemented?\n   - What compliance requirements might apply?\n   - Are there any potential security concerns?\n\nProvide your analysis in a structured, professional format with specific examples from the code.",
+  "summaryPrompt": "Based on the detailed analysis, provide a concise executive summary that includes:\n- Business domain and primary purpose\n- Key technical highlights\n- Main languages and technologies\n- Notable patterns or architectural decisions\n- Any recommendations for improvement",
+  "contextPrompts": {
+    "data-scientist": {
+      "focus": "Focus on data processing pipelines, analytics frameworks, machine learning components, statistical analysis, and data visualization patterns.",
+      "businessContext": "Identify data science use cases, analytical workflows, model deployment patterns, and data-driven decision making processes."
+    },
+    "data-engineer": {
+      "focus": "Focus on data infrastructure, ETL/ELT pipelines, data storage solutions, streaming architectures, and data integration patterns.",
+      "businessContext": "Identify data engineering requirements, scalability patterns, data quality processes, and data platform architectures."
+    },
+    "analytics-professional": {
+      "focus": "Focus on business intelligence tools, reporting systems, dashboard implementations, KPI tracking, and analytical reporting.",
+      "businessContext": "Identify business analytics requirements, reporting workflows, performance metrics, and decision support systems."
+    }
+  }
+}

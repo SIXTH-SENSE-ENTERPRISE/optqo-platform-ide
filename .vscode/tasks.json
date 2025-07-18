@@ -1,0 +1,101 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Run Modular AI Agent Demo",
+			"type": "shell",
+			"command": "node",
+			"args": [
+				"main.js",
+				"init",
+				"data-scientist"
+			],
+			"group": "build",
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Launch GUI",
+			"type": "shell",
+			"command": "npm",
+			"args": ["run", "gui"],
+			"group": "build",
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": false,
+				"panel": "new",
+				"showReuseMessage": true,
+				"clear": false
+			},
+			"options": {
+				"shell": {
+					"executable": "cmd.exe",
+					"args": ["/c"]
+				}
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "Launch GUI (Detached)",
+			"type": "shell",
+			"command": "npm",
+			"args": ["run", "gui-detached"],
+			"group": "build",
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": false,
+				"panel": "new"
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "Launch GUI (VS Code Batch)",
+			"type": "shell",
+			"command": "${workspaceFolder}\\launch-gui-vscode.bat",
+			"group": "build",
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": false,
+				"panel": "new"
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "Launch GUI (External Terminal)",
+			"type": "shell",
+			"command": "start",
+			"args": ["cmd", "/c", "npm run gui"],
+			"group": "build",
+			"presentation": {
+				"echo": true,
+				"reveal": "never",
+				"focus": false,
+				"panel": "new"
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "Start optqo Upload Server",
+			"type": "shell",
+			"command": "node",
+			"args": ["07_interface/servers/08_working_server.js"],
+			"group": "build",
+			"isBackground": true,
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": true,
+				"panel": "new",
+				"showReuseMessage": false,
+				"clear": true
+			},
+			"problemMatcher": [],
+			"runOptions": {
+				"runOn": "default"
+			}
+		}
+	]
+}

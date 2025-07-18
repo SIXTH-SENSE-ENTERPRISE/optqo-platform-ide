@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload Test - optqo Platform</title>
+</head>
+<body>
+    <h1>Server Status Test</h1>
+    <button onclick="testServer()">Test Server Connection</button>
+    <button onclick="testUpload()">Test Upload</button>
+    <div id="output"></div>
+    
+    <script>
+        async function testServer() {
+            const output = document.getElementById('output');
+            try {
+                const response = await fetch('/api/health');
+                const data = await response.json();
+                output.innerHTML = '<h3>Server Status: OK</h3><pre>' + JSON.stringify(data, null, 2) + '</pre>';
+            } catch (error) {
+                output.innerHTML = '<h3>Server Status: ERROR</h3><p>' + error.message + '</p>';
+            }
+        }
+        
+        async function testUpload() {
+            const output = document.getElementById('output');
+            try {
+                const response = await fetch('/api/projects/upload', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        files: [{ name: 'test.js', size: 100, type: 'text/javascript' }],
+                        projectName: 'TestProject'
+                    })
+                });
+                const data = await response.json();
+                output.innerHTML = '<h3>Upload Test: ' + (response.ok ? 'SUCCESS' : 'FAILED') + '</h3><pre>' + JSON.stringify(data, null, 2) + '</pre>';
+            } catch (error) {
+                output.innerHTML = '<h3>Upload Test: ERROR</h3><p>' + error.message + '</p>';
+            }
+        }
+    </script>
+</body>
+</html>

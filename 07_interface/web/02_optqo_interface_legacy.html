@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>optqo Platform - Modular AI Agent</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            min-height: calc(100vh - 40px);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #3498db, #e74c3c);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            font-size: 18px;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        .status-bar {
+            background: #f8f9fa;
+            padding: 15px 30px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #28a745;
+            animation: pulse 2s infinite;
+        }
+
+        .status-indicator.loading {
+            background: #ffc107;
+        }
+
+        .status-indicator.error {
+            background: #dc3545;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .main-content {
+            padding: 40px;
+        }
+
+        .action-section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+
+        .action-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .action-card {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .action-card:hover {
+            border-color: #3498db;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .action-card.primary {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            border-color: #3498db;
+        }
+
+        .action-card.primary:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 30px rgba(52, 152, 219, 0.3);
+        }
+
+        .card-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .card-description {
+            font-size: 14px;
+            opacity: 0.8;
+            line-height: 1.5;
+        }
+
+        .context-selector {
+            margin-bottom: 30px;
+        }
+
+        .context-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .context-tab {
+            padding: 10px 20px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .context-tab.active {
+            background: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+
+        .progress-section {
+            display: none;
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3498db, #2980b9);
+            width: 0%;
+            transition: width 0.3s ease;
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -100px 0; }
+            100% { background-position: 100px 0; }
+        }
+
+        .results-section {
+            display: none;
+            margin-top: 30px;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .metric-card {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #3498db;
+            margin-bottom: 5px;
+        }
+
+        .metric-label {
+            font-size: 14px;
+            color: #6c757d;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(52, 152, 219, 0.3);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .form-input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-info {
+            background: #cce7ff;
+            color: #004085;
+            border: 1px solid #99d1ff;
+        }
+
+        .step-info {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 10px;
+            background: #e8f5e8;
+            border: 1px solid #c3e6cb;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .step-number {
+            background: #28a745;
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+            font-size: 12px;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-content code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+            word-break: break-all;
+        }
+
+        .workspace-info {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid #e9ecef;
+        }
+
+        .workspace-info h3 {
+            color: #007acc;
+            margin: 0 0 15px 0;
+            font-size: 18px;
+        }
+
+        .workspace-paths {
+            display: grid;
+            gap: 10px;
+        }
+
+        .path-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            background: white;
+            border-radius: 4px;
+            border: 1px solid #dee2e6;
+        }
+
+        .path-item strong {
+            color: #495057;
+            min-width: 150px;
+            margin-right: 10px;
+        }
+
+        .path-item span {
+            color: #6c757d;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">Q</div>
+            <div class="subtitle">optqo Platform - Modular AI Agent</div>
+            <div style="font-size: 14px; opacity: 0.8;">Intelligent Code Analysis & Business Context Detection</div>
+        </div>
+
+        <div class="status-bar">
+            <div class="status">
+                <div class="status-indicator" id="statusIndicator"></div>
+                <span id="statusText">Initializing...</span>
+            </div>
+            <div id="currentContext">Context: Loading...</div>
+        </div>
+
+        <div class="main-content">
+            <!-- Context Selector -->
+            <div class="context-selector">
+                <div class="section-title">🎯 Analysis Context</div>
+                <div class="context-tabs" id="contextTabs">
+                    <!-- Contexts will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Main Actions -->
+            <div class="action-section">
+                <div class="section-title">🚀 Choose Analysis Type</div>
+                
+                <div class="action-cards">
+                    <!-- Local Project Analysis - Step by Step -->
+                    <div class="action-card primary">
+                        <span class="card-icon">📁</span>
+                        <div class="card-title">Analyze Local Project</div>
+                        <div class="card-description">Step-by-step analysis of your local project folder</div>
+                        
+                        <!-- Step 1: Select Folder -->
+                        <div style="margin-top: 20px;">
+                            <button class="btn btn-primary" id="selectFolderCard" style="width: 100%;">
+                                📂 Step 1: Select Folder
+                            </button>
+                        </div>
+                        
+                        <!-- Show selected folder info -->
+                        <div id="selectedFolderInfo" style="display: none; margin-top: 15px; text-align: left;"></div>
+                        
+                        <!-- Step 2: Copy to Workspace -->
+                        <div style="margin-top: 15px;">
+                            <button class="btn btn-secondary" id="copyToWorkspaceBtn" disabled style="width: 100%; opacity: 0.5; cursor: not-allowed;">
+                                📋 Step 2: Copy to Workspace
+                            </button>
+                        </div>
+                        
+                        <!-- Show workspace copy info -->
+                        <div id="workspaceCopyInfo" style="display: none; margin-top: 15px; text-align: left;"></div>
+                        
+                        <!-- Step 3: Analyze -->
+                        <div style="margin-top: 15px;">
+                            <button class="btn btn-primary" id="analyzeBtn" disabled style="width: 100%; opacity: 0.5; cursor: not-allowed;">
+                                🔍 Step 3: Analyze Project
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="action-card" id="githubCard">
+                        <span class="card-icon">🌐</span>
+                        <div class="card-title">Analyze GitHub Repository</div>
+                        <div class="card-description">Clone and analyze any public GitHub repository. Perfect for due diligence and learning from open source projects.</div>
+                    </div>
+                </div>
+
+                <!-- GitHub Input -->
+                <div id="githubInput" style="display: none;">
+                    <div class="input-group">
+                        <input type="text" class="form-input" id="githubUrl" placeholder="Enter GitHub URL (e.g., facebook/react or https://github.com/microsoft/vscode)">
+                        <button class="btn btn-primary" id="analyzeGithubBtn">Clone & Analyze</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress Section -->
+            <div class="progress-section" id="progressSection">
+                <div class="section-title">🔍 Analysis in Progress</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div id="progressText">Starting analysis...</div>
+            </div>
+
+            <!-- Results Section -->
+            <div class="results-section" id="resultsSection">
+                <div class="section-title">📊 Analysis Results</div>
+                <div id="alertContainer"></div>
+                <div class="results-grid" id="resultsGrid">
+                    <!-- Results will be displayed here -->
+                </div>
+                <div style="margin-top: 20px; text-align: center;">
+                    <button class="btn btn-secondary" id="newAnalysisBtn">Start New Analysis</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Workspace Info Section -->
+        <div class="workspace-info" id="workspace-info" style="display: none;">
+            <h3>📁 Workspace Organization</h3>
+            <div class="workspace-paths">
+                <div class="path-item">
+                    <strong>Local Projects:</strong> <span id="local-projects-path"></span>
+                </div>
+                <div class="path-item">
+                    <strong>GitHub Repositories:</strong> <span id="github-repos-path"></span>
+                </div>
+                <div class="path-item">
+                    <strong>Analysis Results:</strong> <span id="analysis-results-path"></span>
+                </div>
+                <div class="path-item">
+                    <strong>Reports:</strong> <span id="reports-path"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="gui-script.js"></script>
+</body>
+</html>
