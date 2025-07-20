@@ -1,4 +1,4 @@
-import anthropic
+import boto3
 import subprocess
 import json
 import sys
@@ -12,9 +12,12 @@ from pathlib import Path
 # Load environment variables
 load_dotenv()
 
-# Initialize Anthropic client
-client = anthropic.Anthropic(
-    api_key=os.getenv('ANTHROPIC_API_KEY')
+# Initialize AWS Bedrock client
+client = boto3.client(
+    'bedrock-runtime',
+    aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
+    aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY'),
+    region_name=os.getenv('AWS_REGION')
 )
 
 def execute_command(command):
@@ -547,14 +550,23 @@ def main():
     
     while True:
         try:
-            response = client.messages.create(
-                model="claude-3-7-sonnet-20250219",
-                max_tokens=1024,
-                system=SYSTEM_PROMPT,
-                messages=messages,
-            )
+            # Prepare the request body for AWS Bedrock
+            request_body = {
+                "anthropic_version": "bedrock-2023-05-31",
+                "max_tokens": 1024,
+                "system": SYSTEM_PROMPT,
+                "messages": messages
+            }
             
-            response_content = response.content[0].text
+            response = client.invoke_model(
+                modelId="arn:aws:bedrock:us-east-1:216989122843:inference-profile/us.anthropic.claude-3-7-sonnet-20250219-v1:0",
+                body=json.dumps(request_body),
+                contentType="application/json"
+            )
+            response_body = json.loads(response['body'].read())
+            response_content = response_body['content'][0]['text']
+
+            # response_content = response.content[0].text
             
             # FIXED: Use the parse_response function instead of direct yaml.safe_load
             try:
