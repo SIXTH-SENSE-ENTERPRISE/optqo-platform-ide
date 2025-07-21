@@ -9,6 +9,7 @@ import yaml
 import shutil
 import stat
 from pathlib import Path
+from memory_logger import save_memory, auto_save_memory
 # Load environment variables
 load_dotenv()
 
@@ -249,47 +250,111 @@ def _get_info(path):
 
 import re
 
-def parse_filemanager_input(input_string):
+
+
+# REPLACE YOUR ACTION HANDLING SECTION WITH THIS:
+def handle_action_step(parsed_response):
+    """Simplified action handler"""
+    tool = parsed_response.get("tool")
+    
+    if not tool or tool not in TOOLS_MAP:
+        return f"Error: Unknown tool '{tool}'"
+    
+    print(f"⛏️ ACTION: Calling {tool}")
+    
+    try:
+        if tool == "fileManager":
+            result = call_filemanager_simple(parsed_response)
+        else:
+            input_value = parsed_response.get("input", "")
+            result = TOOLS_MAP[tool](input_value)
+        
+        print(f"📋 OBSERVE: {result}")
+        return result
+        
+    except Exception as error:
+        error_msg = f"Tool execution failed: {error}"
+        print(f"❌ {error_msg}")
+        return error_msg
+
+def parse_claude_natural(input_string):
     """
-    Parse fileManager input in various formats and return parameters
+    Parse Claude's natural function call format, handling any content gracefully
+    Works with: fileManager('operation', 'path', 'any content including CSS/HTML')
     """
-    if not input_string:
+    if not input_string or 'fileManager(' not in input_string:
         return None
     
-    # Handle function call format: fileManager('read', 'file.txt', 'content')
-    if 'fileManager(' in input_string:
-        # Extract content between parentheses
-        match = re.search(r'fileManager\((.*)\)', input_string)
-        if match:
-            args_str = match.group(1)
-            # Simple split by comma and clean quotes
-            args = [arg.strip().strip('\'"') for arg in args_str.split(',')]
-            return args
-    
-    # Handle simple comma format: 'read', 'file.txt'
-    elif ',' in input_string:
-        args = [arg.strip().strip('\'"') for arg in input_string.split(',')]
+    try:
+        # Find the function call
+        start = input_string.find('fileManager(') + 12  # Length of 'fileManager('
+        
+        # Find the matching closing parenthesis
+        paren_count = 1
+        end = start
+        in_quote = False
+        quote_char = None
+        
+        for i in range(start, len(input_string)):
+            char = input_string[i]
+            
+            # Handle quotes
+            if char in ["'", '"'] and not in_quote:
+                in_quote = True
+                quote_char = char
+            elif char == quote_char and in_quote:
+                in_quote = False
+                quote_char = None
+            elif not in_quote:
+                if char == '(':
+                    paren_count += 1
+                elif char == ')':
+                    paren_count -= 1
+                    if paren_count == 0:
+                        end = i
+                        break
+        
+        # Extract arguments string
+        args_str = input_string[start:end]
+        
+        # Simple split by comma, but only outside quotes
+        args = []
+        current_arg = ""
+        in_quote = False
+        quote_char = None
+        
+        for char in args_str:
+            if char in ["'", '"'] and not in_quote:
+                in_quote = True
+                quote_char = char
+            elif char == quote_char and in_quote:
+                in_quote = False
+                quote_char = None
+            elif char == ',' and not in_quote:
+                args.append(current_arg.strip().strip('\'"'))
+                current_arg = ""
+                continue
+            
+            current_arg += char
+        
+        # Add the last argument
+        if current_arg.strip():
+            args.append(current_arg.strip().strip('\'"'))
+        
         return args
-    
-    return None
+        
+    except Exception:
+        # If parsing fails, return None and let other methods handle it
+        return None
 
-def call_filemanager_flexibly(parsed_response):
+def call_filemanager_simple(parsed_response):
     """
-    Call fileManager with flexible input parsing
+    Simple fileManager calling that handles Claude's natural output
     """
-    # Method 1: Check for structured parameters (operation, filepath, etc.)
-    if parsed_response.get("operation"):
-        return file_manager(
-            operation=parsed_response.get("operation"),
-            filepath=parsed_response.get("filepath"),
-            content=parsed_response.get("content"),
-            destination=parsed_response.get("destination"),
-            permissions=parsed_response.get("permissions")
-        )
-    
-    # Method 2: Parse the input field
     input_value = parsed_response.get("input", "")
-    args = parse_filemanager_input(input_value)
+    
+    # Try natural function call parsing first
+    args = parse_claude_natural(input_value)
     
     if args and len(args) >= 2:
         operation = args[0]
@@ -306,33 +371,41 @@ def call_filemanager_flexibly(parsed_response):
             permissions=permissions
         )
     
+    # Fallback: check for structured parameters
+    elif parsed_response.get("operation"):
+        return file_manager(
+            operation=parsed_response.get("operation"),
+            filepath=parsed_response.get("filepath"),
+            content=parsed_response.get("content"),
+            destination=parsed_response.get("destination"),
+            permissions=parsed_response.get("permissions")
+        )
+    
     return "Error: Could not parse fileManager parameters"
 
-# REPLACE YOUR ACTION HANDLING SECTION WITH THIS:
-def handle_action_step(parsed_response):
-    """Handle ACTION step with flexible tool calling"""
-    tool = parsed_response.get("tool")
+def simple_response_cleaner(response_content):
+    """
+    Minimal cleaner - just handle multiple steps and tabs
+    """
+    # Replace tabs with spaces
+    response_content = response_content.replace('\t', '    ')
     
-    if not tool or tool not in TOOLS_MAP:
-        return f"Error: Unknown tool '{tool}'"
-    
-    print(f"⛏️ ACTION: Calling {tool}")
-    
-    try:
-        if tool == "fileManager":
-            result = call_filemanager_flexibly(parsed_response)
-        else:
-            # For other tools, use input directly
-            input_value = parsed_response.get("input", "")
-            result = TOOLS_MAP[tool](input_value)
+    # If multiple steps, keep only the first
+    if response_content.count('step:') > 1:
+        lines = response_content.split('\n')
+        cleaned_lines = []
+        step_found = False
         
-        print(f"📋 OBSERVE: {result}")
-        return result
+        for line in lines:
+            if line.strip().startswith('step:') and step_found:
+                break
+            cleaned_lines.append(line)
+            if line.strip().startswith('step:'):
+                step_found = True
         
-    except Exception as error:
-        error_msg = f"Tool execution failed: {error}"
-        print(f"❌ {error_msg}")
-        return error_msg
+        return '\n'.join(cleaned_lines).strip()
+    
+    return response_content.strip()
 
 TOOLS_MAP = {
     "executeCommand": execute_command,
@@ -342,29 +415,6 @@ TOOLS_MAP = {
 file_manager_prompt = """
 == TOOL USAGE ==
 
-For fileManager (any of these formats work):
-
-METHOD 1 - Function call style (easiest):
-step: action
-tool: fileManager
-input: fileManager('write', 'report.html', 'content here')
-
-METHOD 2 - Simple parameters:
-step: action
-tool: fileManager
-input: 'read', 'filename.txt'
-
-METHOD 3 - Structured (for complex operations):
-step: action
-tool: fileManager
-operation: write
-filepath: report.html
-content: |
-  <!DOCTYPE html>
-  <html>...</html>
-permissions: '755'
-
-EXAMPLE -
 
 == FILEMANAGER OPERATIONS ==
 - read: Read file contents
@@ -395,46 +445,12 @@ step: action
 tool: fileManager
 input: fileManager('read', 'requirements.txt')
 
-COMPLEX CONTENT (use structured format):
-step: action
-tool: fileManager
-operation: write
-filepath: report.html
-content: |
-  <!DOCTYPE html>
-  <html>
-    <style>body { color: blue; }</style>
-    <body><h1>Report</h1></body>
-  </html>
 
-For SIMPLE operations (single line, no special characters):
-step: action
-tool: fileManager
-input: fileManager('read', 'filename.txt')
-
-For COMPLEX content (HTML, CSS, code, multiple lines, or content with colons):
-step: action
-tool: fileManager
-operation: write
-filepath: filename.html
-content: |
-  Your complex content here
-  Can include colons: like this
-  Multiple lines
-  HTML tags <div>etc</div>
-
-IMPORTANT: Use structured format (operation/filepath/content) for ANY content that contains:
-- Colons (:)
-- Multiple lines  
-- HTML/CSS/JavaScript
-- Code files
-- Complex text
-
-Examples:
-- fileManager('read', 'simple.txt') ✓
-- Use structured format for HTML files ✓
-
-Rule: Use structured format for HTML, CSS, code, or any content with colons/quotes
+- Examples input:
+  * fileManager('read', 'file.txt')
+  * fileManager('write', 'report.html', 'content here')
+  * fileManager('copy', 'source.txt', '', 'destination.txt')
+  * fileManager('chmod', 'script.sh', '', '', '755')
 
 IMPORTANT: fileManager creates parent directories automatically and handles all file operations safely.
 """
@@ -455,13 +471,12 @@ Rules:
 - Output must be strictly YAML
 - Only call tool action from Available tools only.
 - Strictly follow the output format in YAML
-- For multi-line commands, use YAML literal block scalars (|)
 - Use platform-appropriate commands automatically
 - If a command fails, the system will try alternatives
 
 Available Tools:
 - executeCommand(command): string Executes a given system command
-- fileManager(operation, filepath, content=None, destination=None, permissions=None): All file operations
+- fileManager('operation', 'filepath', 'content', 'destination', 'permissions'): All file operations
 
 == TOOL USAGE ==
 
@@ -472,29 +487,29 @@ input: ls -la
 
 {file_manager_prompt}
 
-Output Format:
-For THINK: 
+OUTPUT FORMATS:
+
+THINK:
 step: think
 content: |
-  your thinking process
-  with proper indentation
+  Your reasoning here
 
-For ACTION (simple commands):
+ACTION:
 step: action
 tool: toolName
-input: | simple command
+input: toolCommand or fileManager('operation', 'path', 'content')
 
-For ACTION (multi-line commands):
-step: action
-tool: toolName
-input: |
-  multi-line
-  command here
-  with proper indentation
-
-For OUTPUT:
+OUTPUT:
 step: output
-content: | your final response
+content: |
+  Your final answer
+
+
+CRITICAL RULE: You MUST output exactly ONE step per response:
+- If you want to think, output ONLY a think step
+- If you want to take action, output ONLY an action step  
+- If you want to give final output, output ONLY an output step
+- NEVER combine multiple steps in one response
 
 Output EXACTLY ONE YAML object per response. Never output multiple YAML objects.
 Stop immediately after outputting one complete YAML structure.
@@ -531,6 +546,37 @@ def parse_response(response_content):
             print(f"YAML Error: {yaml_error}")
             print(f"JSON Error: {json_error}")
             raise json_error
+
+#response formater to handle multiple steps
+def clean_response(response_content):
+    """
+    Clean Claude's response to prevent YAML parsing errors
+    - Removes multiple step declarations (keeps only the first one)
+    - Strips extra whitespace
+    """
+    # First, replace all tabs with spaces to prevent YAML token errors
+    response_content = response_content.replace('\t', '    ')
+    # Count how many 'step:' declarations exist
+    if response_content.count('step:') <= 1:
+        return response_content.strip()
+    
+    # If multiple steps found, keep only the first complete step
+    lines = response_content.split('\n')
+    cleaned_lines = []
+    step_found = False
+    
+    for line in lines:
+        # If we hit a second 'step:', stop
+        if line.strip().startswith('step:') and step_found:
+            break
+        
+        cleaned_lines.append(line)
+        
+        # Mark that we found the first step
+        if line.strip().startswith('step:'):
+            step_found = True
+    
+    return '\n'.join(cleaned_lines).strip()
             
 def main():
     # Set up signal handler for graceful shutdown
@@ -547,6 +593,12 @@ def main():
     ]
     
     print(f"🚀 Starting query: {user_query}")
+
+    # Initialize step counter for auto-save
+    step_counter = 0
+    
+    # Save initial state
+    print(f"📝 {save_memory(messages, 'initial_state')}")
     
     while True:
         try:
@@ -568,9 +620,11 @@ def main():
 
             # response_content = response.content[0].text
             
+            
             # FIXED: Use the parse_response function instead of direct yaml.safe_load
             try:
-                parsed_response = parse_response(response_content)
+                cleaned_response = simple_response_cleaner(response_content)
+                parsed_response = parse_response(cleaned_response)
             except Exception as parsing_error:
                 print(f"❌ Failed to parse response: {response_content}")
                 print(f"Parsing Error: {parsing_error}")
@@ -581,6 +635,13 @@ def main():
                 "role": "assistant",
                 "content": response_content,
             })
+
+            step_counter += 1
+            
+            # Auto-save every 10 steps
+            auto_save_msg = auto_save_memory(messages, step_counter)
+            if auto_save_msg:
+                print(f"📝 {auto_save_msg}")
             
             # Handle THINK step
             if parsed_response.get("step") == "think":
@@ -596,6 +657,7 @@ def main():
             # Handle OUTPUT step
             if parsed_response.get("step") == "output":
                 print(f"🤖 OUTPUT: {parsed_response.get('content')}")
+                print(f"📝 {save_memory(messages, 'final_state')}")
                 break
             
             # Handle ACTION step
@@ -614,6 +676,7 @@ def main():
             
         except Exception as error:
             print(f"❌ Error in main loop: {error}")
+            print(f"📝 {save_memory(messages, 'error_state')}")
             break
 
 

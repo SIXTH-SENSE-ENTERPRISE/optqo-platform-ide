@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BSE Project Code Analysis Report</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+    h1, h2, h3, h4 {
+      color: #0066cc;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .section {
+      margin-bottom: 30px;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 20px;
+    }
+    .code {
+      font-family: Consolas, monospace;
+      background-color: #f5f5f5;
+      padding: 10px;
+      border-radius: 5px;
+      overflow-x: auto;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 15px 0;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    .file-details {
+      background-color: #f9f9f9;
+      padding: 10px;
+      margin: 10px 0;
+      border-left: 4px solid #0066cc;
+    }
+    .highlight {
+      background-color: #fff3cd;
+      padding: 2px 4px;
+      border-radius: 3px;
+    }
+    .workflow-diagram {
+      margin: 20px 0;
+      padding: 10px;
+      background-color: #f0f8ff;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="section">
+      <h1>BSE Project Code Analysis Report</h1>
+      <p><strong>Date:</strong> Generated on <script>document.write(new Date().toLocaleDateString())</script></p>
+      <p>This report provides a comprehensive analysis of the BSEProject codebase, focusing on structure, functionality, and data flows.</p>
+    </div>
+
+    <div class="section">
+      <h2>Project Overview</h2>
+      <p>The BSEProject appears to be a sophisticated data analytics system for the Bombay Stock Exchange (BSE) that focuses on:</p>
+      <ul>
+        <li>Processing and categorizing company announcements</li>
+        <li>Analyzing trading patterns around these announcements</li>
+        <li>Detecting potential insider trading activity</li>
+        <li>Data cleansing and deduplication of trading records</li>
+      </ul>
+      <p>The system uses SAS (Statistical Analysis System) for data processing, with a combination of SAS code, SQL, and data integration jobs.</p>
+    </div>
+  </div>
+</body>
+</html><div class="section">
+  <h2>Repository Structure</h2>
+  <p>The repository contains various SAS and SQL files that work together to form a complete data processing pipeline:</p>
+  <table>
+    <tr>
+      <th>File Type</th>
+      <th>Count</th>
+      <th>Description</th>
+    </tr>
+    <tr>
+      <td>SAS files (.sas)</td>
+      <td>1</td>
+      <td>Primary SAS code for announcement processing</td>
+    </tr>
+    <tr>
+      <td>SQL files (.sql)</td>
+      <td>3</td>
+      <td>ETL jobs for data deduplication and clustering</td>
+    </tr>
+    <tr>
+      <td>Text files (.txt)</td>
+      <td>7</td>
+      <td>Query files containing SAS code modules</td>
+    </tr>
+    <tr>
+      <td>Excel files (.xls)</td>
+      <td>1</td>
+      <td>Documentation for SAS code understanding</td>
+    </tr>
+  </table>
+</div>
