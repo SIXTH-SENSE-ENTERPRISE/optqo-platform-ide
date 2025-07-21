@@ -21,6 +21,75 @@ client = boto3.client(
     region_name=os.getenv('AWS_REGION')
 )
 
+# Add this entire block here
+import traceback
+from datetime import datetime
+
+class SimpleErrorRecovery:
+    def __init__(self, max_retries=2):
+        self.max_retries = max_retries
+        self.error_history = []
+        
+    def record_error(self, step_type, error, context=None):
+        """Record error with context for AI learning"""
+        error_record = {
+            'timestamp': datetime.now().isoformat(),
+            'step_type': step_type,
+            'error_type': type(error).__name__,
+            'error_message': str(error),
+            'context': context or {},
+            'traceback': traceback.format_exc() if isinstance(error, Exception) else None
+        }
+        self.error_history.append(error_record)
+        
+        # Keep only last 10 errors to avoid memory bloat
+        if len(self.error_history) > 10:
+            self.error_history.pop(0)
+            
+        return error_record
+    
+    def get_error_context_for_ai(self):
+        """Format error history for AI consumption"""
+        if not self.error_history:
+            return ""
+            
+        recent_errors = self.error_history[-3:]  # Last 3 errors
+        
+        error_summary = "RECENT ERRORS ENCOUNTERED:\n"
+        for i, err in enumerate(recent_errors, 1):
+            error_summary += f"{i}. {err['step_type']} failed: {err['error_message']}\n"
+            if err.get('context'):
+                error_summary += f"   Context: {err['context']}\n"
+        
+        error_summary += "\nPlease consider these errors when generating your response and suggest fixes if needed.\n"
+        return error_summary
+
+def extract_from_natural_language(content):
+    """Simple extraction when structured parsing fails"""
+    import re
+    
+    # Look for common patterns
+    step_match = re.search(r'(?:step|action|phase):\s*(\w+)', content, re.IGNORECASE)
+    tool_match = re.search(r'(?:tool|command):\s*(\w+)', content, re.IGNORECASE)
+    content_match = re.search(r'(?:content|description):\s*(.+?)(?=\n\w+:|$)', content, re.IGNORECASE | re.DOTALL)
+    input_match = re.search(r'(?:input|parameters):\s*(.+?)(?=\n\w+:|$)', content, re.IGNORECASE | re.DOTALL)
+    
+    if step_match:
+        result = {'step': step_match.group(1).lower()}
+        
+        if tool_match:
+            result['tool'] = tool_match.group(1)
+        
+        if input_match:
+            result['input'] = input_match.group(1).strip()
+        elif content_match:
+            result['content'] = content_match.group(1).strip()
+        
+        return result
+    
+    return None
+
+
 def execute_command(command):
     """Execute a system command and return the output"""
     try:
@@ -250,15 +319,26 @@ def _get_info(path):
 
 import re
 
-
-
-# REPLACE YOUR ACTION HANDLING SECTION WITH THIS:
-def handle_action_step(parsed_response):
-    """Simplified action handler"""
+def enhanced_handle_action_step(parsed_response, error_recovery):
+    """Enhanced action handler with error recovery"""
     tool = parsed_response.get("tool")
     
-    if not tool or tool not in TOOLS_MAP:
-        return f"Error: Unknown tool '{tool}'"
+    if not tool:
+        error_recovery.record_error(
+            'action_validation',
+            ValueError("No tool specified in action step"),
+            {'parsed_response': parsed_response}
+        )
+        return "Error: No tool specified. Please specify a tool name."
+    
+    if tool not in TOOLS_MAP:
+        available_tools = ", ".join(TOOLS_MAP.keys())
+        error_recovery.record_error(
+            'action_validation', 
+            KeyError(f"Unknown tool: {tool}"),
+            {'available_tools': available_tools}
+        )
+        return f"Error: Unknown tool '{tool}'. Available tools: {available_tools}"
     
     print(f"⛏️ ACTION: Calling {tool}")
     
@@ -273,9 +353,70 @@ def handle_action_step(parsed_response):
         return result
         
     except Exception as error:
-        error_msg = f"Tool execution failed: {error}"
+        error_record = error_recovery.record_error(
+            'tool_execution',
+            error,
+            {
+                'tool': tool,
+                'input': parsed_response.get("input", ""),
+                'parsed_response': parsed_response
+            }
+        )
+        
+        error_msg = f"Tool '{tool}' failed: {str(error)}"
         print(f"❌ {error_msg}")
-        return error_msg
+        
+        # Return detailed error for AI to understand
+        return f"{error_msg}\n\nError details: {error_record['error_message']}\nYou may want to try a different approach or fix the parameters."
+
+    """Enhanced action handler with error recovery"""
+    tool = parsed_response.get("tool")
+    
+    if not tool:
+        error_recovery.record_error(
+            'action_validation',
+            ValueError("No tool specified in action step"),
+            {'parsed_response': parsed_response}
+        )
+        return "Error: No tool specified. Please specify a tool name."
+    
+    if tool not in TOOLS_MAP:
+        available_tools = ", ".join(TOOLS_MAP.keys())
+        error_recovery.record_error(
+            'action_validation', 
+            KeyError(f"Unknown tool: {tool}"),
+            {'available_tools': available_tools}
+        )
+        return f"Error: Unknown tool '{tool}'. Available tools: {available_tools}"
+    
+    print(f"⛏️ ACTION: Calling {tool}")
+    
+    try:
+        if tool == "fileManager":
+            result = call_filemanager_simple(parsed_response)
+        else:
+            input_value = parsed_response.get("input", "")
+            result = TOOLS_MAP[tool](input_value)
+        
+        print(f"📋 OBSERVE: {result}")
+        return result
+        
+    except Exception as error:
+        error_record = error_recovery.record_error(
+            'tool_execution',
+            error,
+            {
+                'tool': tool,
+                'input': parsed_response.get("input", ""),
+                'parsed_response': parsed_response
+            }
+        )
+        
+        error_msg = f"Tool '{tool}' failed: {str(error)}"
+        print(f"❌ {error_msg}")
+        
+        # Return detailed error for AI to understand
+        return f"{error_msg}\n\nError details: {error_record['error_message']}\nYou may want to try a different approach or fix the parameters."
 
 def parse_claude_natural(input_string):
     """
@@ -414,34 +555,7 @@ TOOLS_MAP = {
 
 file_manager_prompt = """
 == TOOL USAGE ==
-
-
-== FILEMANAGER OPERATIONS ==
-- read: Read file contents
-- write: Create/overwrite files
-- append: Add to existing files
-- copy: Copy files (needs destination)
-- move: Move/rename files (needs destination)
-- delete: Remove files/folders
-- mkdir: Create directories
-- chmod: Change permissions
-- exists: Check if file exists
-- info: Get file details
-
-== EXAMPLES ==
-
-Read a file:
-step: action
-tool: fileManager
-input: fileManager('read', 'requirements.txt')
-
-Make script executable:
-step: action
-tool: fileManager
-input: fileManager('chmod', 'script.sh', '755')
-
-SIMPLE CONTENT (use function call):
-step: action
+ 
 tool: fileManager
 input: fileManager('read', 'requirements.txt')
 
@@ -520,33 +634,59 @@ def signal_handler(sig, frame):
     print('\n👋 Goodbye!')
     sys.exit(0)
 
-def parse_response(response_content):
-    """Parse Claude's response, trying YAML first, then JSON as fallback"""
+def enhanced_parse_response(response_content, error_recovery):
+    """Parse Claude's response, trying YAML first, then JSON as fallback, with error recovery"""
+    
+    # Clean the response first
+    cleaned_response = simple_response_cleaner(response_content)
+    parsing_errors = []
+    
+    # Try YAML first (your original approach)
     try:
-        # Try YAML first (better for multi-line content)
-        parsed = yaml.safe_load(response_content)
-        
-        # Validate that we have the required structure
-        if not isinstance(parsed, dict) or 'step' not in parsed:
+        parsed = yaml.safe_load(cleaned_response)
+        if isinstance(parsed, dict) and 'step' in parsed:
+            return parsed
+        else:
             raise ValueError("Response missing required 'step' field")
-            
-        return parsed
-        
-    except (yaml.YAMLError, ValueError) as yaml_error:
-        print(f"⚠️ YAML parsing failed: {yaml_error}")
-        
-        # Fall back to JSON parsing
-        try:
-            parsed = json.loads(response_content)
+    except Exception as e:
+        parsing_errors.append(f"YAML parsing: {str(e)}")
+    
+    # Try JSON as fallback
+    try:
+        parsed = json.loads(cleaned_response)
+        if isinstance(parsed, dict) and 'step' in parsed:
             print("✅ Fell back to JSON parsing successfully")
             return parsed
-            
-        except json.JSONDecodeError as json_error:
-            print(f"❌ Both YAML and JSON parsing failed")
-            print(f"YAML Error: {yaml_error}")
-            print(f"JSON Error: {json_error}")
-            raise json_error
-
+        else:
+            raise ValueError("JSON response missing required 'step' field")
+    except Exception as e:
+        parsing_errors.append(f"JSON parsing: {str(e)}")
+    
+    # Try extracting from natural language if structured parsing fails
+    try:
+        extracted = extract_from_natural_language(response_content)
+        if extracted:
+            print("✅ Used natural language extraction")
+            return extracted
+    except Exception as e:
+        parsing_errors.append(f"Natural language extraction: {str(e)}")
+    
+    # Record the parsing failure
+    error_record = error_recovery.record_error(
+        'response_parsing',
+        Exception(f"All parsing methods failed: {'; '.join(parsing_errors)}"),
+        {'response_preview': response_content[:200]}
+    )
+    
+    print(f"⚠️ All parsing methods failed. Using fallback response.")
+    
+    # Return a fallback response that the AI can work with
+    return {
+        'step': 'output',
+        'content': f"I had trouble parsing my previous response. Here's what I was trying to say:\n\n{response_content}",
+        'parsing_error': True,
+        'error_id': len(error_recovery.error_history)
+    }
 #response formater to handle multiple steps
 def clean_response(response_content):
     """
@@ -579,6 +719,9 @@ def clean_response(response_content):
     return '\n'.join(cleaned_lines).strip()
             
 def main():
+    # Initialize error recovery
+    error_recovery = SimpleErrorRecovery()
+    
     # Set up signal handler for graceful shutdown
     signal.signal(signal.SIGINT, signal_handler)
     
@@ -596,12 +739,23 @@ def main():
 
     # Initialize step counter for auto-save
     step_counter = 0
+    consecutive_errors = 0
+    max_consecutive_errors = 3
     
     # Save initial state
     print(f"📝 {save_memory(messages, 'initial_state')}")
     
     while True:
         try:
+            # Add error context to messages if we have recent errors
+            error_context = error_recovery.get_error_context_for_ai()
+            if error_context and consecutive_errors > 0:
+                # Add error context as a system message
+                messages.append({
+                    "role": "user",
+                    "content": f"SYSTEM ERROR CONTEXT:\n{error_context}\nPlease continue with this context in mind."
+                })
+            
             # Prepare the request body for AWS Bedrock
             request_body = {
                 "anthropic_version": "bedrock-2023-05-31",
@@ -618,17 +772,24 @@ def main():
             response_body = json.loads(response['body'].read())
             response_content = response_body['content'][0]['text']
 
-            # response_content = response.content[0].text
-            
-            
-            # FIXED: Use the parse_response function instead of direct yaml.safe_load
+            # Enhanced parsing with error recovery
             try:
-                cleaned_response = simple_response_cleaner(response_content)
-                parsed_response = parse_response(cleaned_response)
+                parsed_response = enhanced_parse_response(response_content, error_recovery)
+                consecutive_errors = 0  # Reset error counter on successful parsing
             except Exception as parsing_error:
-                print(f"❌ Failed to parse response: {response_content}")
-                print(f"Parsing Error: {parsing_error}")
-                break
+                consecutive_errors += 1
+                
+                if consecutive_errors >= max_consecutive_errors:
+                    print(f"❌ Too many consecutive errors ({consecutive_errors}). Stopping.")
+                    print(f"📝 {save_memory(messages, 'error_termination')}")
+                    break
+                
+                # Create a fallback response
+                parsed_response = {
+                    'step': 'output',
+                    'content': f"I encountered parsing errors. Here's my raw response:\n\n{response_content}",
+                    'error_recovery': True
+                }
             
             # Add the AI's response to the message history
             messages.append({
@@ -656,13 +817,24 @@ def main():
             
             # Handle OUTPUT step
             if parsed_response.get("step") == "output":
-                print(f"🤖 OUTPUT: {parsed_response.get('content')}")
-                print(f"📝 {save_memory(messages, 'final_state')}")
+                output_content = parsed_response.get('content')
+                print(f"🤖 OUTPUT: {output_content}")
+                
+                # If there were errors, mention them in the final save
+                final_state_name = 'final_state_with_errors' if error_recovery.error_history else 'final_state'
+                print(f"📝 {save_memory(messages, final_state_name)}")
+                
+                # Show error summary if there were any errors
+                if error_recovery.error_history:
+                    print(f"\n⚠️ ERRORS ENCOUNTERED: {len(error_recovery.error_history)} errors during execution")
+                    for err in error_recovery.error_history[-3:]:  # Show last 3
+                        print(f"   - {err['step_type']}: {err['error_message']}")
+                
                 break
             
-            # Handle ACTION step
+            # Handle ACTION step with enhanced error recovery
             if parsed_response.get("step") == "action":
-                result = handle_action_step(parsed_response)
+                result = enhanced_handle_action_step(parsed_response, error_recovery)
     
                 messages.append({
                     "role": "user",
@@ -672,12 +844,41 @@ def main():
             
             # If we get here, the response format was unexpected
             print(f"❌ Unexpected response format: {parsed_response}")
-            break
+            
+            # Record this as an error but continue
+            error_recovery.record_error(
+                'response_format',
+                ValueError(f"Unexpected step type: {parsed_response.get('step')}"),
+                {'parsed_response': parsed_response}
+            )
+            
+            # Ask AI to clarify
+            messages.append({
+                "role": "user",
+                "content": f"I received an unexpected response format. Please provide a valid step (think/action/output).",
+            })
+            consecutive_errors += 1
+            
+            if consecutive_errors >= max_consecutive_errors:
+                print(f"❌ Too many format errors. Stopping.")
+                break
             
         except Exception as error:
+            consecutive_errors += 1
+            error_recovery.record_error('main_loop', error)
+            
             print(f"❌ Error in main loop: {error}")
-            print(f"📝 {save_memory(messages, 'error_state')}")
-            break
+            
+            if consecutive_errors >= max_consecutive_errors:
+                print(f"❌ Too many consecutive errors. Stopping.")
+                print(f"📝 {save_memory(messages, 'critical_error_state')}")
+                break
+            
+            # Try to continue by asking the AI to help
+            messages.append({
+                "role": "user",
+                "content": f"An error occurred: {str(error)}. Please suggest how to proceed or provide your final output.",
+            })
 
 
 
