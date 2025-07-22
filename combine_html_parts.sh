@@ -1,0 +1,1 @@
+#!/bin/bash\ncat bse_project_analysis_part1.html bse_project_analysis_part2.html bse_project_analysis_part3.html bse_project_analysis_part4.html bse_project_analysis_part5.html bse_project_analysis_part6.html bse_project_analysis_part7.html bse_project_analysis_part8.html bse_project_analysis_part9.html > bse_project_analysis_final.html
