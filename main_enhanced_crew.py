@@ -28,7 +28,7 @@ sys.path.append(str(Path(__file__).parent))
 try:
     # Existing components
     from agent1_discovery import ProjectDiscoveryAgent
-    from agent3_report import ReportGenerationAgent
+    from agent3_report import EnhancedReportGenerationAgent
     
     # New enhanced crew components (these would be in separate files)
     from chunking_service import ChunkingService

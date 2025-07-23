@@ -7,7 +7,7 @@ from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import threading
 import time
-
+from agent3_report import EnhancedReportGenerationAgent
 # Import required classes
 from chunking_service import ChunkingService
 from aggregation_agent import AggregationAgent
@@ -266,10 +266,9 @@ def run_enhanced_analysis(repository_path):
         print(f"✅ Crew analysis complete")
         
         # Step 3: Report Generation (using existing Agent 3)
-        print("\n📊 Phase 3: Professional Report Generation")
-        from agent3_report import ReportGenerationAgent  # Import existing Agent 3
+        print("\n📊 Phase 3: Professional Report Generation")# Import existing Agent 3
         
-        report_agent = ReportGenerationAgent()
+        report_agent = EnhancedReportGenerationAgent()
         report_result = report_agent.generate_report(
             crew_analysis['agent1_output'],
             crew_analysis['agent2_output']
