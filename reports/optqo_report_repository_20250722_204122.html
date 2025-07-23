@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>optqo Platform - repository Analysis Report</title>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            line-height: 1.5;
+            color: #414042;
+            background: #fafafa;
+            font-size: 14px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .header {
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 15px 0;
+            margin-bottom: 25px;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo {
+            width: 35px;
+            height: 35px;
+            background: linear-gradient(135deg, #0098c2 0%, #8f53a1 100%);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .brand-text h1 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #414042;
+            margin-bottom: 2px;
+        }
+
+        .brand-text p {
+            font-size: 11px;
+            color: #919396;
+            font-weight: 500;
+        }
+
+        .report-info {
+            text-align: right;
+            font-size: 11px;
+            color: #919396;
+        }
+
+        .report-title {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            margin-bottom: 25px;
+        }
+
+        .report-title h2 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #414042;
+            margin-bottom: 5px;
+        }
+
+        .report-title p {
+            color: #919396;
+            font-size: 14px;
+        }
+
+        .section {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            margin-bottom: 20px;
+        }
+
+        .section h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #414042;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #0098c2;
+            padding-bottom: 5px;
+        }
+
+        .section h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #414042;
+            margin: 15px 0 8px 0;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .metric-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 6px;
+            border: 1px solid #e5e7eb;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #0098c2;
+            margin-bottom: 5px;
+        }
+
+        .metric-label {
+            font-size: 12px;
+            color: #919396;
+            font-weight: 500;
+        }
+
+        .quality-bar {
+            background: #e9ecef;
+            height: 6px;
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 5px 0;
+        }
+
+        .quality-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        .quality-excellent { background: #28a745; }
+        .quality-good { background: #0098c2; }
+        .quality-average { background: #ffc107; }
+        .quality-poor { background: #dc3545; }
+
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .tech-item {
+            background: #f8f9fa;
+            border: 1px solid #e5e7eb;
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tech-icon {
+            font-size: 24px;
+            color: #0098c2;
+        }
+
+        .tech-name {
+            font-size: 12px;
+            font-weight: 600;
+            color: #414042;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 13px;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .data-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #414042;
+            font-size: 12px;
+        }
+
+        .data-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .priority-high {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .priority-medium {
+            background: #fff3cd;
+            color: #856404;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .priority-low {
+            background: #d4edda;
+            color: #155724;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .footer {
+            background: #414042;
+            color: white;
+            padding: 15px 0;
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .footer p {
+            font-size: 11px;
+            margin-bottom: 3px;
+        }
+
+        .footer .brand-name {
+            color: #0098c2;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .data-table {
+                font-size: 11px;
+            }
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="brand">
+                    <div class="logo">Q</div>
+                    <div class="brand-text">
+                        <h1>optqo Platform</h1>
+                        <p>Intelligent Assessment with Advanced AI</p>
+                    </div>
+                </div>
+                <div class="report-info">
+                    <p>Generated: July 2025</p>
+                    <p>Analysis ID: OPTQO-20250722-001</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container">
+        
+        <div class="report-title">
+            <h2>repository - Codebase Analysis Report</h2>
+            <p>Comprehensive assessment of TEXT-based system architecture, quality, and business impact</p>
+        </div>
+        
+        <div class="section">
+            <h3>Executive Summary</h3>
+            
+            <p style="margin-bottom: 15px;">The analyzed system is a <strong>The system appears to focus on financial regulatory compliance, specifically analyzing insider trading patterns by tracking buy/sell transactions before and after announcement dates, and comparing them to market behavior</strong> with an overall quality score of <strong>52%</strong>. The system demonstrates medium-scale architecture and processing capabilities.</p>
+            
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-value">17</div>
+                    <div class="metric-label">Total Files</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">4</div>
+                    <div class="metric-label">Technologies</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">52%</div>
+                    <div class="metric-label">Quality Score</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">360.5K</div>
+                    <div class="metric-label">Lines of Code</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h3>Technology Stack</h3>
+            <p>Primary Technology: <strong>TEXT</strong></p>
+            <div class="tech-grid">
+                
+                <div class="tech-item">
+                    <div class="tech-icon">🗄️</div>
+                    <div class="tech-name">SQL</div>
+                    <div style="font-size: 10px; color: #919396;">4 files</div>
+                </div>
+                <div class="tech-item">
+                    <div class="tech-icon">📄</div>
+                    <div class="tech-name">TEXT</div>
+                    <div style="font-size: 10px; color: #919396;">10 files</div>
+                </div>
+                <div class="tech-item">
+                    <div class="tech-icon">📊</div>
+                    <div class="tech-name">SAS</div>
+                    <div style="font-size: 10px; color: #919396;">1 files</div>
+                </div>
+                <div class="tech-item">
+                    <div class="tech-icon">📝</div>
+                    <div class="tech-name">MARKDOWN</div>
+                    <div style="font-size: 10px; color: #919396;">1 files</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h3>Code Quality Assessment</h3>
+            
+            <h4>Functionality</h4>
+            <div class="quality-bar">
+                <div class="quality-fill quality-good" style="width: 72%;"></div>
+            </div>
+            <p style="font-size: 11px; color: #919396; margin-bottom: 15px;">72% - Good: Average across 2 chunks...</p>
+            
+            <h4>Code Organization</h4>
+            <div class="quality-bar">
+                <div class="quality-fill quality-average" style="width: 52%;"></div>
+            </div>
+            <p style="font-size: 11px; color: #919396; margin-bottom: 15px;">52% - Average: Average across 2 chunks...</p>
+            
+            <h4>Documentation</h4>
+            <div class="quality-bar">
+                <div class="quality-fill quality-average" style="width: 50%;"></div>
+            </div>
+            <p style="font-size: 11px; color: #919396; margin-bottom: 15px;">50% - Average: Average across 2 chunks...</p>
+            
+            <h4>Best Practices</h4>
+            <div class="quality-bar">
+                <div class="quality-fill quality-poor" style="width: 42%;"></div>
+            </div>
+            <p style="font-size: 11px; color: #919396; margin-bottom: 15px;">42% - Needs Improvement: Average across 2 chunks...</p>
+            
+            <h4>Error Handling</h4>
+            <div class="quality-bar">
+                <div class="quality-fill quality-poor" style="width: 38%;"></div>
+            </div>
+            <p style="font-size: 11px; color: #919396; margin-bottom: 15px;">38% - Needs Improvement: Average across 2 chunks...</p>
+            
+            <h4>Performance</h4>
+            <div class="quality-bar">
+                <div class="quality-fill quality-average" style="width: 58%;"></div>
+            </div>
+            <p style="font-size: 11px; color: #919396; margin-bottom: 15px;">58% - Average: Average across 2 chunks...</p>
+            
+        </div>
+        
+        <div class="section">
+            <h3>Architecture Analysis</h3>
+            
+            <h4>System Pattern</h4>
+            <p><strong>ETL Pipeline</strong></p>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-top: 20px;">
+                <div>
+                    <h4>Architectural Strengths</h4>
+                    <ul style="margin-left: 20px; color: #28a745;">
+                        
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4>Areas of Concern</h4>
+                    <ul style="margin-left: 20px; color: #dc3545;">
+                        <li>Incomplete and truncated files causing execution failures</li><li>Lack of comprehensive data validation</li><li>Hard-coded database connections, paths and server details</li><li>Absence of input validation for critical parameters</li><li>Multiple truncated files with incomplete code</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h3>Strategic Recommendations</h3>
+            
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Priority</th>
+                        <th>Recommendation</th>
+                        <th>Business Impact</th>
+                        <th>Effort</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="priority-high">HIGH</span></td>
+                        <td>Complete the truncated code files to ensure full functionality</td>
+                        <td>Restore full system functionality and prevent processing errors</td>
+                        <td>1-2 weeks</td>
+                    </tr>
+                    <tr>
+                        <td><span class="priority-high">HIGH</span></td>
+                        <td>Reconstruct the complete analysis pipeline from fragmented files into a coherent, modularized codeba</td>
+                        <td>Ensure reliable execution of the insider trading detection system and improve maintainability</td>
+                        <td>2-3 weeks</td>
+                    </tr>
+                    <tr>
+                        <td><span class="priority-high">HIGH</span></td>
+                        <td>Implement proper input validation and parameterization for all SQL queries</td>
+                        <td>Prevent SQL injection vulnerabilities and improve data integrity</td>
+                        <td>1 week</td>
+                    </tr>
+                    <tr>
+                        <td><span class="priority-high">HIGH</span></td>
+                        <td>Implement comprehensive error handling with appropriate logging</td>
+                        <td>Improve system reliability and provide better diagnostic information for troubleshooting</td>
+                        <td>1 week</td>
+                    </tr>
+                    <tr>
+                        <td><span class="priority-medium">MEDIUM</span></td>
+                        <td>Externalize configuration parameters (server addresses, file paths, etc.) to configuration files</td>
+                        <td>Improved maintainability and easier deployment across environments</td>
+                        <td>1 week</td>
+                    </tr>
+                    <tr>
+                        <td><span class="priority-medium">MEDIUM</span></td>
+                        <td>Implement comprehensive data validation before processing financial data</td>
+                        <td>Reduced risk of incorrect financial analysis and improved data quality</td>
+                        <td>2 weeks</td>
+                    </tr>
+                    <tr>
+                        <td><span class="priority-medium">MEDIUM</span></td>
+                        <td>Externalize configuration data like server connections, file paths and thresholds to configuration f</td>
+                        <td>Improve portability between environments and centralize configuration management</td>
+                        <td>3-4 days</td>
+                    </tr>
+                    <tr>
+                        <td><span class="priority-medium">MEDIUM</span></td>
+                        <td>Document the insider trading detection algorithms, business rules and scoring model logic</td>
+                        <td>Enable validation of detection methodology by business stakeholders and facilitate future enhancemen</td>
+                        <td>1 week</td>
+                    </tr>
+                    <tr>
+                        <td><span class="priority-low">LOW</span></td>
+                        <td>Refactor repetitive code patterns into reusable functions</td>
+                        <td>Improved maintainability and reduced risk of inconsistent processing</td>
+                        <td>3 weeks</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    
+    <div class="footer">
+        <p>Generated by <span class="brand-name">optqo Platform</span> - Intelligent Assessment with Advanced AI</p>
+        <p>© 2025 optqo. All rights reserved.</p>
+    </div>
+</body>
+</html>

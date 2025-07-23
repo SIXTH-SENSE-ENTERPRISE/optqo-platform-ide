@@ -1,0 +1,68 @@
+{
+  "timestamp": "20250722_203948",
+  "system": "repository_analysis_orchestrator",
+  "execution_steps": [
+    {
+      "step": "INIT",
+      "timestamp": "20250722_203948",
+      "description": "Starting analysis of repository: /home/rishav/Documents/Code/6th-sense/Optqo_repo_function/repository"
+    },
+    {
+      "step": "STAGE1_COMPLETE",
+      "timestamp": "20250722_203948",
+      "description": "Project discovery complete - 17 files analyzed",
+      "duration_seconds": 0.003112,
+      "data": {
+        "files_found": 17
+      }
+    },
+    {
+      "step": "STAGE2_COMPLETE",
+      "timestamp": "20250722_204122",
+      "description": "Code analysis complete - Quality Score: 52%",
+      "duration_seconds": 93.432807,
+      "data": {
+        "quality_score": 52
+      }
+    },
+    {
+      "step": "STAGE3_COMPLETE",
+      "timestamp": "20250722_204122",
+      "description": "Professional report generated: reports/optqo_report_repository_20250722_204122.html",
+      "duration_seconds": 0.000336,
+      "data": {
+        "report_path": "reports/optqo_report_repository_20250722_204122.html"
+      }
+    },
+    {
+      "step": "SUCCESS",
+      "timestamp": "20250722_204122",
+      "description": "Complete analysis finished in 93.4s",
+      "duration_seconds": 93.436397
+    }
+  ],
+  "final_result": {
+    "repository_path": "/home/rishav/Documents/Code/6th-sense/Optqo_repo_function/repository",
+    "project_name": "repository",
+    "analysis_summary": {
+      "total_files": 17,
+      "primary_technology": "TEXT",
+      "quality_score": 52,
+      "chunking_used": true
+    },
+    "output_files": {
+      "html_report": "reports/optqo_report_repository_20250722_204122.html",
+      "discovery_log": "/home/rishav/Documents/Code/6th-sense/Optqo_repo_function/log/agent1_discovery_20250722_203948.json",
+      "analysis_log": "log/agent2_analysis_20250722_203948.json",
+      "report_log": "log/agent3_report_20250722_203948.json",
+      "system_log": "log/system_orchestrator_20250722_203948.json"
+    },
+    "execution_time": {
+      "total_seconds": 93.436397,
+      "stage1_seconds": 0.003112,
+      "stage2_seconds": 93.432807,
+      "stage3_seconds": 0.000336
+    },
+    "success": true
+  }
+}
