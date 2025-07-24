@@ -24,6 +24,18 @@ from datetime import datetime
 # Add current directory to path for imports
 sys.path.append(str(Path(__file__).parent))
 
+# Import progress emitter for web interface updates
+try:
+    from progress_emitter import start_discovery, complete_discovery, start_crew_analysis, complete_crew_analysis, start_report_generation, complete_report_generation
+except ImportError:
+    # Fallback functions if progress_emitter is not available
+    def start_discovery(): pass
+    def complete_discovery(files_found=None): pass
+    def start_crew_analysis(): pass
+    def complete_crew_analysis(): pass
+    def start_report_generation(): pass
+    def complete_report_generation(): pass
+
 # Import all components
 try:
     # Existing components
@@ -185,6 +197,9 @@ Examples:
         # Run the enhanced crew analysis
         print("🚀 STARTING ANALYSIS...")
         print("-" * 40)
+        
+        # Emit overall analysis start
+        start_discovery()
         
         result = run_enhanced_analysis(str(repo_path), str(log_dir))
         

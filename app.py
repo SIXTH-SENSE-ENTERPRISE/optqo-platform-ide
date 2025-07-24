@@ -40,6 +40,9 @@ class AnalysisRunner:
         self.repo_path = repo_path
         self.process = None
         self.thread = None
+        self.progress_file = projects_dir / project_id / f"progress_{project_id}.json"
+        self.progress_thread = None
+        self.progress_running = False
         
     def find_actual_repo_path(self):
         """Find the actual repository path, handling Git clone subdirectories"""
@@ -66,8 +69,53 @@ class AnalysisRunner:
         env['OPTQO_PROJECT_ID'] = self.project_id
         env['OPTQO_LOG_DIR'] = str(project_path / "logs")
         env['OPTQO_REPORTS_DIR'] = str(project_path / "reports")
+        env['OPTQO_PROGRESS_DIR'] = str(project_path)  # For progress communication
+        
+        # Fix Python buffering for real-time output
+        env['PYTHONUNBUFFERED'] = '1'
         
         return env
+    
+    def start_progress_monitoring(self):
+        """Start monitoring progress file for flowchart updates"""
+        self.progress_running = True
+        self.progress_thread = threading.Thread(target=self.monitor_progress)
+        self.progress_thread.start()
+        
+    def stop_progress_monitoring(self):
+        """Stop monitoring progress file"""
+        self.progress_running = False
+        if self.progress_thread:
+            self.progress_thread.join(timeout=1)
+            
+    def monitor_progress(self):
+        """Monitor progress file and emit updates"""
+        import time
+        last_modified = 0
+        
+        while self.progress_running:
+            try:
+                if self.progress_file.exists():
+                    current_modified = self.progress_file.stat().st_mtime
+                    if current_modified > last_modified:
+                        last_modified = current_modified
+                        
+                        # Read progress data
+                        with open(self.progress_file, 'r') as f:
+                            progress_data = json.load(f)
+                        
+                        # Emit progress update
+                        socketio.emit('step_update', {
+                            'project_id': self.project_id,
+                            'step': progress_data.get('step'),
+                            'status': progress_data.get('status'),
+                            'timestamp': progress_data.get('timestamp')
+                        })
+                        
+            except Exception as e:
+                pass  # Ignore file read errors
+                
+            time.sleep(0.5)  # Check every 500ms
         
     def run_analysis(self):
         """Run the analysis in a separate thread with real-time output streaming"""
@@ -81,11 +129,14 @@ class AnalysisRunner:
                 'timestamp': datetime.now().isoformat()
             })
             
+            # Start progress monitoring
+            self.start_progress_monitoring()
+            
             # Set up project environment
             env = self.setup_project_environment()
             
-            # Build command - run from main project directory
-            cmd = f"source venv/bin/activate && python3 main_enhanced_crew.py '{actual_repo_path}'"
+            # Build command - run from main project directory (unbuffered for real-time output)
+            cmd = f"source venv/bin/activate && python3 -u main_enhanced_crew.py '{actual_repo_path}'"
             
             socketio.emit('terminal_output', {
                 'project_id': self.project_id,
@@ -104,7 +155,8 @@ class AnalysisRunner:
                 universal_newlines=True,
                 bufsize=1,
                 cwd=str(working_dir),
-                env=env
+                env=env,
+                executable='/bin/bash'
             )
             
             # Stream output line by line
@@ -122,17 +174,38 @@ class AnalysisRunner:
             
             self.process.wait()
             
-            # Move generated files to project directory if they exist in main directories
-            self.move_generated_files()
+            # Stop progress monitoring
+            self.stop_progress_monitoring()
             
-            # Analysis complete
-            socketio.emit('analysis_complete', {
-                'project_id': self.project_id,
-                'success': self.process.returncode == 0,
-                'timestamp': datetime.now().isoformat()
-            })
+            # Check if process completed successfully
+            if self.process.returncode == 0:
+                # Move generated files to project directory if they exist in main directories
+                self.move_generated_files()
+                
+                # Analysis complete
+                socketio.emit('analysis_complete', {
+                    'project_id': self.project_id,
+                    'success': True,
+                    'timestamp': datetime.now().isoformat()
+                })
+            else:
+                # Process failed
+                socketio.emit('terminal_output', {
+                    'project_id': self.project_id,
+                    'output': f'❌ Analysis process failed with exit code: {self.process.returncode}',
+                    'timestamp': datetime.now().isoformat()
+                })
+                
+                socketio.emit('analysis_complete', {
+                    'project_id': self.project_id,
+                    'success': False,
+                    'timestamp': datetime.now().isoformat()
+                })
             
         except Exception as e:
+            # Stop progress monitoring on error
+            self.stop_progress_monitoring()
+            
             socketio.emit('analysis_error', {
                 'project_id': self.project_id,
                 'error': str(e),
@@ -299,13 +372,14 @@ def api_create_project():
 
 @app.route('/api/projects/<project_id>/upload', methods=['POST'])
 def api_upload_files(project_id):
-    """API endpoint to upload files to a project"""
+    """API endpoint to upload folder to a project"""
     if 'file' not in request.files:
-        return jsonify({'error': 'No file provided'}), 400
+        return jsonify({'error': 'No files provided'}), 400
     
-    file = request.files['file']
-    if file.filename == '':
-        return jsonify({'error': 'No file selected'}), 400
+    # Get all files (folder upload sends multiple files)
+    files = request.files.getlist('file')
+    if not files or len(files) == 0:
+        return jsonify({'error': 'No files selected'}), 400
     
     project_path = projects_dir / project_id
     if not project_path.exists():
@@ -314,27 +388,32 @@ def api_upload_files(project_id):
     repo_path = project_path / "repository"
     
     try:
-        # Handle zip file upload
-        if file.filename.endswith('.zip'):
-            with tempfile.NamedTemporaryFile(delete=False, suffix='.zip') as tmp_file:
-                file.save(tmp_file.name)
+        # Process all files from the folder upload
+        for file in files:
+            if file.filename == '':
+                continue
                 
-                # Extract zip file
-                with zipfile.ZipFile(tmp_file.name, 'r') as zip_ref:
-                    zip_ref.extractall(repo_path)
-                
-                os.unlink(tmp_file.name)
-        else:
-            # Save single file
-            file.save(repo_path / file.filename)
+            # Get the relative path from the file (webkitdirectory provides this)
+            # The filename includes the full relative path like "folder/subfolder/file.txt"
+            relative_path = file.filename
+            
+            # Create the full destination path
+            dest_path = repo_path / relative_path
+            
+            # Create directories if they don't exist
+            dest_path.parent.mkdir(parents=True, exist_ok=True)
+            
+            # Save the file
+            file.save(dest_path)
         
         # Update project metadata
         metadata = get_project_metadata(project_id)
         metadata['status'] = 'uploaded'
         metadata['uploaded_at'] = datetime.now().isoformat()
+        metadata['source_info']['files_count'] = len(files)
         save_project_metadata(project_id, metadata)
         
-        return jsonify({'success': True})
+        return jsonify({'success': True, 'files_uploaded': len(files)})
         
     except Exception as e:
         return jsonify({'error': str(e)}), 500

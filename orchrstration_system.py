@@ -8,6 +8,23 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import threading
 import time
 from agent3_report import EnhancedReportGenerationAgent
+
+# Import progress emitter for web interface updates
+try:
+    from progress_emitter import (
+        complete_discovery, start_crew_analysis, complete_crew_analysis, 
+        start_report_generation, complete_report_generation,
+        start_agent, complete_agent
+    )
+except ImportError:
+    # Fallback functions if progress_emitter is not available
+    def complete_discovery(files_found=None): pass
+    def start_crew_analysis(): pass
+    def complete_crew_analysis(): pass
+    def start_report_generation(): pass
+    def complete_report_generation(): pass
+    def start_agent(agent_name): pass
+    def complete_agent(agent_name): pass
 # Import required classes
 from chunking_service import ChunkingService
 from aggregation_agent import AggregationAgent
@@ -165,6 +182,9 @@ class EnhancedCrewOrchestrator:
                     specialist_outputs[agent_name] = result
                     self._log_step("AGENT_SUCCESS", f"✅ {agent_name} completed successfully")
                     
+                    # Emit progress for agent completion
+                    complete_agent(agent_name)
+                    
                 except Exception as e:
                     self._log_error(agent_name, e)
                     specialist_outputs[agent_name] = {
@@ -197,6 +217,10 @@ class EnhancedCrewOrchestrator:
         for attempt in range(max_retries):
             try:
                 self._log_step("AGENT_ATTEMPT", f"{agent_name} attempt {attempt + 1}")
+                
+                # Emit progress for agent start (only on first attempt)
+                if attempt == 0:
+                    start_agent(agent_name)
                 
                 # Execute agent analysis
                 result = agent.analyze(specialist_input)
@@ -257,16 +281,20 @@ def run_enhanced_analysis(repository_path, log_dir="log"):
         agent1_output = discovery_agent.analyze_directory(repository_path)
         
         print(f"✅ Discovery complete: {agent1_output['project_overview']['total_files']} files found")
+        complete_discovery(agent1_output['project_overview']['total_files'])
         
         # Step 2: Enhanced Crew Analysis
         print("\n🎭 Phase 2: Enhanced Specialist Crew Analysis")
+        start_crew_analysis()
         orchestrator = EnhancedCrewOrchestrator(log_dir)
         crew_analysis = orchestrator.analyze_repository(agent1_output)
         
         print(f"✅ Crew analysis complete")
+        complete_crew_analysis()
         
         # Step 3: Report Generation (using existing Agent 3)
         print("\n📊 Phase 3: Professional Report Generation")# Import existing Agent 3
+        start_report_generation()
         
         report_agent = EnhancedReportGenerationAgent()
         report_result = report_agent.generate_report(
@@ -275,6 +303,7 @@ def run_enhanced_analysis(repository_path, log_dir="log"):
         )
         
         print(f"✅ Report generated: {report_result['report_path']}")
+        complete_report_generation()
         
         # Final summary
         print("\n🎉 ENHANCED CREW ANALYSIS COMPLETE")
