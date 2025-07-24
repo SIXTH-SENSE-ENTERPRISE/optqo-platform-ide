@@ -55,10 +55,21 @@ except ImportError as e:
 
 def setup_logging_directory():
     """Ensure logging directory exists"""
-    log_dir = Path("log")
-    log_dir.mkdir(exist_ok=True)
+    # Check for environment variables from web interface
+    log_dir_env = os.getenv('OPTQO_LOG_DIR')
+    reports_dir_env = os.getenv('OPTQO_REPORTS_DIR')
     
-    reports_dir = Path("reports")
+    if log_dir_env:
+        log_dir = Path(log_dir_env)
+    else:
+        log_dir = Path("log")
+    
+    if reports_dir_env:
+        reports_dir = Path(reports_dir_env)
+    else:
+        reports_dir = Path("reports")
+    
+    log_dir.mkdir(exist_ok=True)
     reports_dir.mkdir(exist_ok=True)
     
     return log_dir, reports_dir
@@ -175,7 +186,7 @@ Examples:
         print("🚀 STARTING ANALYSIS...")
         print("-" * 40)
         
-        result = run_enhanced_analysis(str(repo_path))
+        result = run_enhanced_analysis(str(repo_path), str(log_dir))
         
         # Process results
         if result['status'] == 'SUCCESS':

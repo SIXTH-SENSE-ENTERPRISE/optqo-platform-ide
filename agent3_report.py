@@ -1,4 +1,5 @@
 import json
+import os
 from pathlib import Path
 from datetime import datetime
 import html
@@ -23,8 +24,12 @@ class EnhancedReportGenerationAgent:
         
         print(f"📝 Enhanced Agent 3 logging to: {log_file}")
         
-        # Report output directory
-        self.reports_dir = Path("reports")
+        # Report output directory - check for environment variable from web interface
+        reports_dir_env = os.getenv('OPTQO_REPORTS_DIR')
+        if reports_dir_env:
+            self.reports_dir = Path(reports_dir_env)
+        else:
+            self.reports_dir = Path("reports")
         self.reports_dir.mkdir(exist_ok=True)
     
     def _log_step(self, step_name, description, data=None):

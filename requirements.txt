@@ -3,3 +3,5 @@ python-dotenv
 PyYAML
 boto3
 pathlib
+flask
+flask-socketio

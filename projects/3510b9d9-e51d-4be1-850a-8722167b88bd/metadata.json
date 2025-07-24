@@ -1,0 +1,13 @@
+{
+  "id": "3510b9d9-e51d-4be1-850a-8722167b88bd",
+  "name": "project2",
+  "description": "",
+  "created_at": "2025-07-24T20:09:31.841825",
+  "status": "analyzing",
+  "source_type": "git",
+  "source_info": {
+    "repo_url": "https://github.com/SIXTH-SENSE-ENTERPRISE/BSEProject"
+  },
+  "cloned_at": "2025-07-24T20:09:34.186327",
+  "analysis_started_at": "2025-07-24T20:09:40.416497"
+}

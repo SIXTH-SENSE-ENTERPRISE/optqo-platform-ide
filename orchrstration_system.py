@@ -242,7 +242,7 @@ class EnhancedCrewOrchestrator:
 
 
 # Enhanced main execution function
-def run_enhanced_analysis(repository_path):
+def run_enhanced_analysis(repository_path, log_dir="log"):
     """Run the complete enhanced crew analysis on a repository"""
     
     print("🚀 STARTING ENHANCED CREW ANALYSIS")
@@ -260,7 +260,7 @@ def run_enhanced_analysis(repository_path):
         
         # Step 2: Enhanced Crew Analysis
         print("\n🎭 Phase 2: Enhanced Specialist Crew Analysis")
-        orchestrator = EnhancedCrewOrchestrator()
+        orchestrator = EnhancedCrewOrchestrator(log_dir)
         crew_analysis = orchestrator.analyze_repository(agent1_output)
         
         print(f"✅ Crew analysis complete")

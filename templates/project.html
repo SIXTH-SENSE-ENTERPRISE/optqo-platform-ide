@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>optqo Platform - {{ metadata.name }}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            line-height: 1.5;
+            color: #414042;
+            background: #fafafa;
+            font-size: 14px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .header {
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 15px 0;
+            margin-bottom: 25px;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo {
+            width: 35px;
+            height: 35px;
+            background: linear-gradient(135deg, #0098c2 0%, #8f53a1 100%);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .brand-text h1 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #414042;
+            margin-bottom: 2px;
+        }
+
+        .brand-text p {
+            font-size: 11px;
+            color: #919396;
+            font-weight: 500;
+        }
+
+        .project-header {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            margin-bottom: 25px;
+        }
+
+        .project-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .project-title h2 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #414042;
+        }
+
+        .project-status {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-created { background: #e3f2fd; color: #1976d2; }
+        .status-uploaded { background: #f3e5f5; color: #7b1fa2; }
+        .status-cloned { background: #e8f5e8; color: #388e3c; }
+        .status-analyzing { background: #fff3e0; color: #f57c00; }
+        .status-completed { background: #e8f5e8; color: #2e7d32; }
+
+        .project-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: #0098c2;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0077a0;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+
+        .analysis-section {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .flowchart-section {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .flowchart-section h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #414042;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #0098c2;
+            padding-bottom: 5px;
+        }
+
+        .flowchart {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 6px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .flow-step {
+            background: white;
+            padding: 12px 15px;
+            border-radius: 6px;
+            border: 2px solid #e5e7eb;
+            margin: 8px 0;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: #919396;
+            transition: all 0.3s ease;
+        }
+
+        .flow-step.active {
+            border-color: #ffc107;
+            background: #fff3cd;
+            color: #856404;
+            animation: pulse 2s infinite;
+        }
+
+        .flow-step.completed {
+            border-color: #28a745;
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .flow-arrow {
+            text-align: center;
+            color: #919396;
+            font-size: 16px;
+            margin: 2px 0;
+        }
+
+        .flow-arrow.active {
+            color: #ffc107;
+        }
+
+        .crew-agents {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin: 10px 0;
+        }
+
+        .agent-step {
+            background: white;
+            padding: 8px 10px;
+            border-radius: 4px;
+            border: 1px solid #e5e7eb;
+            font-size: 10px;
+            font-weight: 600;
+            color: #919396;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .agent-step.active {
+            border-color: #ffc107;
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .agent-step.completed {
+            border-color: #28a745;
+            background: #d4edda;
+            color: #155724;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        .terminal-section {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .terminal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .terminal-header h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #414042;
+            border-bottom: 2px solid #0098c2;
+            padding-bottom: 5px;
+        }
+
+        .terminal-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .terminal-controls button {
+            padding: 4px 8px;
+            border: none;
+            border-radius: 4px;
+            font-size: 10px;
+            cursor: pointer;
+            background: #f8f9fa;
+            color: #414042;
+        }
+
+        .terminal {
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 12px;
+            height: 400px;
+            overflow-y: auto;
+            border: 1px solid #333;
+        }
+
+        .terminal.collapsed {
+            height: 50px;
+            overflow: hidden;
+        }
+
+        .terminal-line {
+            margin-bottom: 2px;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .terminal-line.error {
+            color: #ff6b6b;
+        }
+
+        .terminal-line.warning {
+            color: #ffd93d;
+        }
+
+        .terminal-line.success {
+            color: #6bcf7f;
+        }
+
+        .results-section {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            margin-bottom: 25px;
+        }
+
+        .results-section h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #414042;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #0098c2;
+            padding-bottom: 5px;
+        }
+
+        .report-frame {
+            width: 100%;
+            height: 600px;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+        }
+
+        .footer {
+            background: #414042;
+            color: white;
+            padding: 15px 0;
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .footer p {
+            font-size: 11px;
+            margin-bottom: 3px;
+        }
+
+        .footer .brand-name {
+            color: #0098c2;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .analysis-section {
+                grid-template-columns: 1fr;
+            }
+
+            .crew-agents {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="brand">
+                    <div class="logo">Q</div>
+                    <div class="brand-text">
+                        <h1>optqo Platform</h1>
+                        <p>Intelligent Assessment with Advanced AI</p>
+                    </div>
+                </div>
+                <div style="text-align: right; font-size: 11px; color: #919396;">
+                    <p>Project: {{ metadata.name }}</p>
+                    <p id="current-time"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="project-header">
+            <div class="project-title">
+                <h2>{{ metadata.name }}</h2>
+                <div class="project-status status-{{ metadata.status }}" id="project-status">
+                    {{ metadata.status }}
+                </div>
+            </div>
+            <p style="color: #919396; margin-bottom: 10px;">{{ metadata.description or 'No description' }}</p>
+            <div style="font-size: 11px; color: #919396;">
+                <p>Created: {{ metadata.created_at[:10] }}</p>
+                {% if metadata.source_type == 'git' %}
+                <p>Repository: {{ metadata.source_info.repo_url }}</p>
+                {% endif %}
+            </div>
+            <div class="project-actions">
+                <button class="btn btn-primary" id="start-analysis" onclick="startAnalysis()">
+                    🚀 Start Analysis
+                </button>
+                <button class="btn btn-secondary" onclick="window.location.href='/'">
+                    ← Back to Dashboard
+                </button>
+            </div>
+        </div>
+
+        <div class="analysis-section">
+            <div class="terminal-section">
+                <div class="terminal-header">
+                    <h3>Live Analysis Output</h3>
+                    <div class="terminal-controls">
+                        <button onclick="toggleTerminal()">Collapse/Expand</button>
+                        <button onclick="clearTerminal()">Clear</button>
+                    </div>
+                </div>
+                <div class="terminal" id="terminal">
+                    <div class="terminal-line">optqo Platform - Ready for analysis</div>
+                    <div class="terminal-line">Click "Start Analysis" to begin repository assessment...</div>
+                </div>
+            </div>
+
+            <div class="flowchart-section">
+                <h3>Analysis Progress</h3>
+                <div class="flowchart">
+                    <div class="flow-step" id="step-discovery">
+                        📁 Repository Discovery & Chunking
+                    </div>
+                    <div class="flow-arrow">↓</div>
+                    
+                    <div class="flow-step" id="step-crew-analysis">
+                        🎭 Enhanced Specialist Crew Analysis
+                    </div>
+                    <div class="crew-agents">
+                        <div class="agent-step" id="agent-technology-detection">Technology Detection</div>
+                        <div class="agent-step" id="agent-code-quality">Code Quality</div>
+                        <div class="agent-step" id="agent-architecture-dataflow">Architecture & Data Flow</div>
+                        <div class="agent-step" id="agent-file-structure">File Structure</div>
+                        <div class="agent-step" id="agent-business-context">Business Context</div>
+                        <div class="agent-step" id="agent-performance-analysis">Performance Analysis</div>
+                    </div>
+                    <div class="flow-arrow">↓</div>
+                    
+                    <div class="flow-step" id="step-report-generation">
+                        📊 Professional Report Generation
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="results-section" id="results-section" style="display: none;">
+            <h3>Analysis Results</h3>
+            <iframe id="report-frame" class="report-frame" src=""></iframe>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>Powered by <span class="brand-name">optqo Platform</span> - Intelligent Assessment with Advanced AI</p>
+        <p>© 2025 optqo. All rights reserved.</p>
+    </div>
+
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+    <script>
+        // Initialize
+        const projectId = '{{ project_id }}';
+        let socket;
+        let isAnalyzing = false;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCurrentTime();
+            setInterval(updateCurrentTime, 1000);
+            initializeWebSocket();
+        });
+
+        function updateCurrentTime() {
+            const now = new Date();
+            document.getElementById('current-time').textContent = now.toLocaleString();
+        }
+
+        function initializeWebSocket() {
+            socket = io();
+            
+            socket.on('connect', function() {
+                addTerminalLine('🌐 Connected to optqo Platform', 'success');
+            });
+
+            socket.on('terminal_output', function(data) {
+                if (data.project_id === projectId) {
+                    addTerminalLine(data.output);
+                }
+            });
+
+            socket.on('step_update', function(data) {
+                if (data.project_id === projectId) {
+                    updateFlowchartStep(data.step, data.status);
+                }
+            });
+
+            socket.on('analysis_complete', function(data) {
+                if (data.project_id === projectId) {
+                    isAnalyzing = false;
+                    updateProjectStatus('completed');
+                    addTerminalLine('🎉 Analysis completed successfully!', 'success');
+                    loadAnalysisResults();
+                    
+                    const button = document.getElementById('start-analysis');
+                    button.textContent = '✅ Analysis Complete';
+                    button.disabled = false;
+                }
+            });
+
+            socket.on('analysis_error', function(data) {
+                if (data.project_id === projectId) {
+                    isAnalyzing = false;
+                    addTerminalLine('❌ Analysis failed: ' + data.error, 'error');
+                    
+                    const button = document.getElementById('start-analysis');
+                    button.textContent = '🚀 Start Analysis';
+                    button.disabled = false;
+                }
+            });
+
+            socket.on('disconnect', function() {
+                addTerminalLine('⚠️ Disconnected from server', 'warning');
+            });
+        }
+
+        function addTerminalLine(text, type = '') {
+            const terminal = document.getElementById('terminal');
+            const line = document.createElement('div');
+            line.className = 'terminal-line' + (type ? ' ' + type : '');
+            line.textContent = `[${new Date().toLocaleTimeString()}] ${text}`;
+            terminal.appendChild(line);
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        function updateFlowchartStep(step, status) {
+            // Reset all steps first if starting discovery
+            if (step === 'discovery' && status === 'active') {
+                resetFlowchart();
+            }
+
+            const stepMappings = {
+                'discovery': 'step-discovery',
+                'discovery_complete': 'step-discovery',
+                'crew_analysis': 'step-crew-analysis',
+                'technology_detection': 'agent-technology-detection',
+                'code_quality': 'agent-code-quality',
+                'architecture_dataflow': 'agent-architecture-dataflow',
+                'file_structure': 'agent-file-structure',
+                'business_context': 'agent-business-context',
+                'performance_analysis': 'agent-performance-analysis',
+                'crew_complete': 'step-crew-analysis',
+                'report_generation': 'step-report-generation',
+                'report_complete': 'step-report-generation'
+            };
+
+            const elementId = stepMappings[step];
+            if (elementId) {
+                const element = document.getElementById(elementId);
+                if (element) {
+                    element.classList.remove('active', 'completed');
+                    element.classList.add(status);
+                }
+            }
+        }
+
+        function resetFlowchart() {
+            const steps = document.querySelectorAll('.flow-step, .agent-step');
+            steps.forEach(step => {
+                step.classList.remove('active', 'completed');
+            });
+        }
+
+        function updateProjectStatus(status) {
+            const statusElement = document.getElementById('project-status');
+            statusElement.className = `project-status status-${status}`;
+            statusElement.textContent = status;
+        }
+
+        async function startAnalysis() {
+            if (isAnalyzing) return;
+
+            const button = document.getElementById('start-analysis');
+            button.textContent = '⏳ Starting Analysis...';
+            button.disabled = true;
+            isAnalyzing = true;
+
+            clearTerminal();
+            resetFlowchart();
+            updateProjectStatus('analyzing');
+
+            try {
+                const response = await fetch(`/api/projects/${projectId}/analyze`, {
+                    method: 'POST'
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    addTerminalLine('🚀 Analysis started successfully', 'success');
+                    button.textContent = '⏳ Analyzing...';
+                } else {
+                    addTerminalLine('❌ Failed to start analysis: ' + result.error, 'error');
+                    button.textContent = '🚀 Start Analysis';
+                    button.disabled = false;
+                    isAnalyzing = false;
+                }
+            } catch (error) {
+                addTerminalLine('❌ Error starting analysis: ' + error.message, 'error');
+                button.textContent = '🚀 Start Analysis';
+                button.disabled = false;
+                isAnalyzing = false;
+            }
+        }
+
+        async function loadAnalysisResults() {
+            try {
+                const response = await fetch(`/api/projects/${projectId}/report`);
+                
+                if (response.ok) {
+                    const reportFrame = document.getElementById('report-frame');
+                    reportFrame.src = `/api/projects/${projectId}/report`;
+                    document.getElementById('results-section').style.display = 'block';
+                    
+                    // Scroll to results
+                    document.getElementById('results-section').scrollIntoView({ 
+                        behavior: 'smooth' 
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading results:', error);
+            }
+        }
+
+        function toggleTerminal() {
+            const terminal = document.getElementById('terminal');
+            terminal.classList.toggle('collapsed');
+        }
+
+        function clearTerminal() {
+            const terminal = document.getElementById('terminal');
+            terminal.innerHTML = '';
+            addTerminalLine('Terminal cleared');
+        }
+    </script>
+</body>
+</html> 
